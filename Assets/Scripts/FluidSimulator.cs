@@ -161,7 +161,9 @@ public abstract class FluidSimulator : MonoBehaviour
 		{
 			info.fluidParameters.container = transform;
 		}
-		GameObject poolObject = GameObject.Instantiate(new GameObject(), info.fluidParameters.container);
+		GameObject poolObject = new GameObject();
+		poolObject.transform.parent = info.fluidParameters.container;
+		poolObject.name = string.Format("{0} Pool", familyName);
 		pool = poolObject.AddComponent<FluidPool>();
 		pool.simulator = this;
 
