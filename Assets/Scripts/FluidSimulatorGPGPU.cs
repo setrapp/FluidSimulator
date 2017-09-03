@@ -20,7 +20,7 @@ public class FluidSimulatorGPGPU : FluidSimulator
 	int computeDivergenceKernel;
 	int relaxDivergenceKernel;
 	int removeDivergenceKernel;
-	int containBoundariesKernel;
+	int zeroedBoundariesKernel;
 	int wrapBoundariesKernel;
 
 	[Header("Computation")]
@@ -87,7 +87,7 @@ public class FluidSimulatorGPGPU : FluidSimulator
 		computeDivergenceKernel = fluidComputer.FindKernel("ComputeDivergence");
 		relaxDivergenceKernel = fluidComputer.FindKernel("RelaxDivergence");
 		removeDivergenceKernel = fluidComputer.FindKernel("RemoveDivergence");
-		containBoundariesKernel = fluidComputer.FindKernel("ContainBoundaries");
+		zeroedBoundariesKernel = fluidComputer.FindKernel("EmptyBoundaries");
 
 		// This assumes all kernels of c ompute shader use the same number of threads per group.
 		threadsPerGroup = new uint[3];
@@ -266,11 +266,11 @@ public class FluidSimulatorGPGPU : FluidSimulator
 		fluidComputer.Dispatch(clampDataKernel, threadGroups[0], threadGroups[1], threadGroups[2]);
 	}
 
-	protected override void containBoundaries()
+	protected override void emptyBoundaries()
 	{
-		fluidComputer.SetBuffer(containBoundariesKernel, "inBuffer", inFluidBuffer);
-		fluidComputer.SetBuffer(containBoundariesKernel, "outBuffer", outFluidBuffer);
-		fluidComputer.Dispatch(containBoundariesKernel, threadGroups[0], 1, 1);// threadGroups[1], threadGroups[2]);
+		fluidComputer.SetBuffer(zeroedBoundariesKernel, "inBuffer", inFluidBuffer);
+		fluidComputer.SetBuffer(zeroedBoundariesKernel, "outBuffer", outFluidBuffer);
+		fluidComputer.Dispatch(zeroedBoundariesKernel, threadGroups[0], 1, 1);
 	}
 
 	protected override void applyCells()

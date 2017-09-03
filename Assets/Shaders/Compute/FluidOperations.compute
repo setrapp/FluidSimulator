@@ -250,6 +250,8 @@ void RemoveDivergence (uint3 id : SV_DispatchThreadId, uint3 groupId : SV_GroupI
 void EmptyBoundaries (uint3 id : SV_DispatchThreadId, uint3 groupId : SV_GroupId, uint3 threadId : SV_GroupThreadId)
 {
 	int maxIndex = (threadGroups * threadsPerGroup) - 1;
+	int sampleCorner = ((threadId.x == 0) && (groupId.x == 0)) -
+		((threadId.x == threadsPerGroup.x - 1) && (groupId.x == threadGroups.x - 1));
 	int index;
 
 	// Bottom

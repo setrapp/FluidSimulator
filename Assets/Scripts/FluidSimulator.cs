@@ -25,7 +25,7 @@ public abstract class FluidSimulator : MonoBehaviour
 	[Serializable]
 	public class OperationParameters
 	{
-		public FluidPoolBoundaryCondition boundaryCondition = FluidPoolBoundaryCondition.CONTAIN;
+		public FluidPoolBoundaryCondition boundaryCondition = FluidPoolBoundaryCondition.EMPTY;
 		public float diffusionRate = 0.05f;
 		public int relaxationIterations = 20;
 	}
@@ -76,9 +76,8 @@ public abstract class FluidSimulator : MonoBehaviour
 
 	public enum FluidPoolBoundaryCondition
 	{
-		//NONE
-		//EMPTY
-		CONTAIN = 0,
+		EMPTY = 0
+		//CONTAIN Implement
 		//WRAP TODO Implement
 		//LEAK TODO Implement
 	}
@@ -137,7 +136,7 @@ public abstract class FluidSimulator : MonoBehaviour
 	protected abstract void relaxDivergence();
 	protected abstract void removeDivergence();
 	protected abstract void clampData();
-	protected abstract void containBoundaries();
+	protected abstract void emptyBoundaries();
 	protected abstract void applyCells();
 	protected abstract void prepareNextFrame();
 	protected abstract void swapBuffers();
@@ -405,8 +404,8 @@ public abstract class FluidSimulator : MonoBehaviour
 		Profiler.BeginSample("SetBoundaries");
 		switch (info.operationParameters.boundaryCondition)
 		{
-			case FluidPoolBoundaryCondition.CONTAIN:
-				containBoundaries();
+			case FluidPoolBoundaryCondition.EMPTY:
+				emptyBoundaries();
 				break;
 		}
 		Profiler.EndSample();

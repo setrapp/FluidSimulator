@@ -56,7 +56,7 @@ GameObject:
   - component: {fileID: 114000014195457748}
   - component: {fileID: 65000013587796144}
   m_Layer: 0
-  m_Name: FluidCellRenderer
+  m_Name: Cell
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

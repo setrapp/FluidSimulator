@@ -119,7 +119,7 @@ MonoBehaviour:
   info:
     fluidParameters:
       container: {fileID: 0}
-      gridSize: 16
+      gridSize: 32
       physicalSize: 16
     cellParameters:
       defaultCell:
@@ -128,11 +128,11 @@ MonoBehaviour:
         rawDivergence: 0
         relaxedDivergence: 0
       cellMaxDensity: 1
-      cellMaxSpeed: 20
+      cellMaxSpeed: 5
       cellMass: 1
     operationParameters:
       boundaryCondition: 0
-      diffusionRate: 0.05
+      diffusionRate: 0.005
       relaxationIterations: 20
     operationFlags:
       applyExternals: 1
@@ -146,7 +146,7 @@ MonoBehaviour:
       centerVisible: 0
       densityVisible: 1
       velocityVisible: 1
-  cellPrefab: {fileID: 114000014195457748, guid: 62abf2af95d0580438998963ec1eb3bb,
+  cellPrefab: {fileID: 114000014195457748, guid: e41896cc43767fe4da5ca5c132ca5260,
     type: 2}
   fluidComputer: {fileID: 7200000, guid: 2612196cd8877ab48930170b6ef5156f, type: 3}
 --- !u!114 &114105785418012140
@@ -183,7 +183,7 @@ MonoBehaviour:
   info:
     fluidParameters:
       container: {fileID: 0}
-      gridSize: 16
+      gridSize: 32
       physicalSize: 16
     cellParameters:
       defaultCell:
@@ -196,7 +196,7 @@ MonoBehaviour:
       cellMass: 1
     operationParameters:
       boundaryCondition: 0
-      diffusionRate: 0.05
+      diffusionRate: 0.005
       relaxationIterations: 20
     operationFlags:
       applyExternals: 1
@@ -210,5 +210,5 @@ MonoBehaviour:
       centerVisible: 0
       densityVisible: 1
       velocityVisible: 1
-  cellPrefab: {fileID: 114000014195457748, guid: 62abf2af95d0580438998963ec1eb3bb,
+  cellPrefab: {fileID: 114000014195457748, guid: e41896cc43767fe4da5ca5c132ca5260,
     type: 2}

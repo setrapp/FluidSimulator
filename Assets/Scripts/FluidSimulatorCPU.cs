@@ -301,7 +301,7 @@ public class FluidSimulatorCPU : FluidSimulator {
 		}
 	}
 
-	protected override void containBoundaries()
+	protected override void emptyBoundaries()
 	{
 		int sampleCorner;
 		float cornerSample;
