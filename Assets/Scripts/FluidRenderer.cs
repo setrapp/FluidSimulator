@@ -2,8 +2,7 @@
 using UnityEngine;
 using UnityEngine.Profiling;
 
-// Rename to FluidRenderer
-public abstract class FluidPool : MonoBehaviour
+public abstract class FluidRenderer : MonoBehaviour
 {
 	public FluidSimulator Simulator { get; private set; }
 
@@ -19,7 +18,7 @@ public abstract class FluidPool : MonoBehaviour
 		string result = null;
 		if (Simulator != null)
 		{
-			result = "Attempting to re-initialize FluidPool";
+			result = "Attempting to re-initialize FluidRenderer";
 		}
 
 		if (string.IsNullOrEmpty(result))

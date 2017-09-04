@@ -55,7 +55,7 @@ namespace junk
 
 				if (globalDataValid)
 				{
-					//globalDensity.text = string.Format("Density ({0:0.##})", selected.Pool.globalDensity);
+					//globalDensity.text = string.Format("Density ({0:0.##})", selected.Renderer.globalDensity);
 				}
 			}
 

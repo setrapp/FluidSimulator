@@ -11,10 +11,10 @@ public class FluidDispatcher : MonoBehaviour {
 	[SerializeField]
 	FluidSimulator gpgpuSimulator;
 	public RendererMode rendererMode = RendererMode.OBJECTS;
-	new FluidPool renderer;
-	public FluidPool Renderer { get { return renderer; } }
+	new FluidRenderer renderer;
+	public FluidRenderer Renderer { get { return renderer; } }
 	[SerializeField]
-	FluidPoolObjects objectsRenderer;
+	FluidRendererObjects objectsRenderer;
 
 	public bool initializeOnStart = true;
 	public string FamilyName { get; private set; }

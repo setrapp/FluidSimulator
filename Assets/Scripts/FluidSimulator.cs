@@ -25,7 +25,7 @@ public abstract class FluidSimulator : MonoBehaviour
 	[Serializable]
 	public class OperationParameters
 	{
-		public FluidPoolBoundaryCondition boundaryCondition = FluidPoolBoundaryCondition.EMPTY;
+		public BoundaryCondition boundaryCondition = BoundaryCondition.EMPTY;
 		public float diffusionRate = 0.05f;
 		public int relaxationIterations = 20;
 	}
@@ -74,7 +74,7 @@ public abstract class FluidSimulator : MonoBehaviour
 		}
 	}
 
-	public enum FluidPoolBoundaryCondition
+	public enum BoundaryCondition
 	{
 		EMPTY = 0
 		//CONTAIN Implement
@@ -83,7 +83,7 @@ public abstract class FluidSimulator : MonoBehaviour
 	}
 	#endregion
 
-	// TODO Maybe make a build pool flag to totally rebuild with new sizes.
+	// TODO Maybe make a build fluid flag to totally rebuild with new sizes.
 	[HideInInspector]
 	public bool resetFluid = false;
 	[HideInInspector]
@@ -97,7 +97,7 @@ public abstract class FluidSimulator : MonoBehaviour
 	public bool autoSimulate = true;
 
 	public FluidSimulatorInfo info;
-	new protected FluidPool renderer;
+	new protected FluidRenderer renderer;
 	FluidOperationPass[] operations;
 	protected int operationPassNumber = 0;
 	public float CellSize { get; private set; }
@@ -143,7 +143,7 @@ public abstract class FluidSimulator : MonoBehaviour
 	protected abstract void pause();
 	protected abstract void step();
 
-	public bool Initialize(string familyName, FluidPool renderer)
+	public bool Initialize(string familyName, FluidRenderer renderer)
 	{
 		this.familyName = familyName;
 		string result = null;
@@ -384,7 +384,7 @@ public abstract class FluidSimulator : MonoBehaviour
 		Profiler.BeginSample("SetBoundaries");
 		switch (info.operationParameters.boundaryCondition)
 		{
-			case FluidPoolBoundaryCondition.EMPTY:
+			case BoundaryCondition.EMPTY:
 				emptyBoundaries();
 				break;
 		}

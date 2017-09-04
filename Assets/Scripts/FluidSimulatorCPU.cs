@@ -189,7 +189,7 @@ public class FluidSimulatorCPU : FluidSimulator {
 
 	protected override void computeDivergence()
 	{
-		float reciprocalPoolSize = 1.0f / info.fluidParameters.gridSize;
+		float reciprocalGridSize = 1.0f / info.fluidParameters.gridSize;
 
 		for (int i = 0; i < info.fluidParameters.gridSize; i++)
 		{
@@ -200,7 +200,7 @@ public class FluidSimulatorCPU : FluidSimulator {
 				int down = Mathf.Max(j - 1, 0);
 				int up = Mathf.Min(j + 1, info.fluidParameters.gridSize - 1);
 
-				outCells[i, j].rawDivergence = -0.5f * reciprocalPoolSize *
+				outCells[i, j].rawDivergence = -0.5f * reciprocalGridSize *
 					((inCells[right, j].velocity.x - inCells[left, j].velocity.x) +
 					(inCells[i, up].velocity.y - inCells[i, down].velocity.y));
 				outCells[i, j].relaxedDivergence = 0;

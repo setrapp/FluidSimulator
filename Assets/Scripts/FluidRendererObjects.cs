@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
-using System.Collections;
 
-public class FluidPoolObjects : FluidPool, IRenderArray
+public class FluidRendererObjects : FluidRenderer, IRenderArray
 {
 	[SerializeField]
 	public FluidCellRenderer cellPrefab;
@@ -14,14 +13,14 @@ public class FluidPoolObjects : FluidPool, IRenderArray
 		if (cellPrefab != null)
 		{
 			FluidSimulator.FluidSimulatorInfo info = Simulator.info;
-			float halfPoolSize = info.fluidParameters.gridSize / 2;
+			float halfGridSize = info.fluidParameters.gridSize / 2;
 			cells = new FluidCellRenderer[info.fluidParameters.gridSize, info.fluidParameters.gridSize];
 			for (int i = 0; i < info.fluidParameters.gridSize; i++)
 			{
 				for (int j = 0; j < info.fluidParameters.gridSize; j++)
 				{
 					float cellSize = Simulator.CellSize;
-					Vector3 pos = transform.position + new Vector3(cellSize * (i - halfPoolSize), cellSize * (j - halfPoolSize), 0);
+					Vector3 pos = transform.position + new Vector3(cellSize * (i - halfGridSize), cellSize * (j - halfGridSize), 0);
 					FluidCellRenderer newCell = (((GameObject)Instantiate(cellPrefab.gameObject, pos, Quaternion.identity, transform)).GetComponent<FluidCellRenderer>());
 					newCell.Initialize(Simulator, info.cellParameters.defaultCell, i, j);
 					newCell.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
