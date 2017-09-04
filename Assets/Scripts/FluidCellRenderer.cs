@@ -63,16 +63,10 @@ public class FluidCellRenderer : MonoBehaviour {
 
 	void SetRenderedColor()
 	{
-		solidRenderer.material.color = Color.black;
-		outlineRenderer.material.color = Color.black;
-		centerRenderer.material.color = Color.black;
-
 		if (Simulator.info.visualizationFlags.densityVisible)
 		{
 			Color densityColor = new Color(0, 0, Mathf.Min(cell.density, Simulator.info.cellParameters.cellMaxDensity) / Simulator.info.cellParameters.cellMaxDensity, 1);
 			solidRenderer.material.color = densityColor;
-			outlineRenderer.material.color = densityColor * 0.75f;
-			centerRenderer.material.color = densityColor * 0.75f;
 		}
 	}
 
