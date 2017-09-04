@@ -6,7 +6,6 @@ public class FluidSimulatorGPGPU : FluidSimulator
 	[Header("Cell Rendering")]
 	[SerializeField]
 	public FluidCellRenderer cellPrefab;
-	FluidCellRenderer[,] cells;
 	FluidCell[,] cellBuffer1;
 	FluidCell[,] cellBuffer2;
 	FluidCell[,] inCells;
@@ -36,47 +35,9 @@ public class FluidSimulatorGPGPU : FluidSimulator
 	private ComputeBuffer outFluidBuffer;
 
 	private ComputeBuffer externalAdditionBuffer;
-	public Vector3[,] reverseVelocities;
 
 	public FluidCellOperationData[,] operationData;
 	public ComputeBuffer operationDataBuffer;
-
-	protected override string generatePoolCells()
-	{
-		string result = null;
-
-		if (cellPrefab == null)
-		{
-			result = string.Format("No Cell Prefab provided to {0}'s pool.", gameObject.name);
-		}
-		else if (fluidComputer == null)
-		{
-			result = string.Format("No Fluid Computer provided to {0}'s pool.", gameObject.name);
-		}
-		else
-		{
-			float halfPoolSize = info.fluidParameters.gridSize / 2;
-			cells = new FluidCellRenderer[info.fluidParameters.gridSize, info.fluidParameters.gridSize];
-			externalAdditions = new FluidCell[info.fluidParameters.gridSize, info.fluidParameters.gridSize];
-			reverseVelocities = new Vector3[info.fluidParameters.gridSize, info.fluidParameters.gridSize];
-			for (int i = 0; i < info.fluidParameters.gridSize; i++)
-			{
-				for (int j = 0; j < info.fluidParameters.gridSize; j++)
-				{
-					Vector3 pos = transform.position + new Vector3(CellSize * (i - halfPoolSize), CellSize * (j - halfPoolSize), 0);
-					FluidCellRenderer newCell = (((GameObject)Instantiate(cellPrefab.gameObject, pos, Quaternion.identity, pool.transform)).GetComponent<FluidCellRenderer>());
-					newCell.Initialize(this, info.cellParameters.defaultCell, i, j);
-					newCell.transform.localScale = new Vector3(CellSize, CellSize, CellSize);
-					cells[i, j] = newCell;
-
-					externalAdditions[i, j] = new FluidCell();
-					reverseVelocities[i, j] = Vector3.zero;
-				}
-			}
-		}
-
-		return result;
-	}
 
 	protected override string initializeBuffers()
 	{
@@ -105,6 +66,7 @@ public class FluidSimulatorGPGPU : FluidSimulator
 		Debug.Log("Thread Groups: " + threadGroups[0] + " " + threadGroups[1] + " " + threadGroups[2]);
 
 		initialCells = new FluidCell[info.fluidParameters.gridSize, info.fluidParameters.gridSize];
+		externalAdditions = new FluidCell[info.fluidParameters.gridSize, info.fluidParameters.gridSize];
 		operationData = new FluidCellOperationData[info.fluidParameters.gridSize, info.fluidParameters.gridSize];
 
 		for (int i = 0; i < info.fluidParameters.gridSize; i++)
@@ -112,6 +74,7 @@ public class FluidSimulatorGPGPU : FluidSimulator
 			for (int j = 0; j < info.fluidParameters.gridSize; j++)
 			{
 				initialCells[i, j] = new FluidCell();
+				externalAdditions[i, j] = new FluidCell();
 				operationData[i, j] = new FluidCellOperationData();
 			}
 		}
@@ -164,18 +127,14 @@ public class FluidSimulatorGPGPU : FluidSimulator
 		{
 			for (int j = (int)Mathf.Max(index.y - applyCellRadius, 1); j < Mathf.Min(index.y + applyCellRadius + 1, info.fluidParameters.gridSize - 1); j++)
 			{
-				// Order cells as (j, i) -> (x, y)
-				int x = j;
-				int y = i;
-
 				int distance = Mathf.Max(Mathf.Abs(i - index.x), Mathf.Abs(j - index.y));
 				if (distance <= densityCellRadius)
 				{
-					externalAdditions[x, y].density = densityChange - (densityFalloff * distance);
+					externalAdditions[i, j].density = densityChange - (densityFalloff * distance);
 				}
 				if (distance <= forceCellRadius)
 				{
-					externalAdditions[x, y].velocity = force - (forceFalloff * distance);
+					externalAdditions[i, j].velocity = force - (forceFalloff * distance);
 				}
 			}
 		}
@@ -183,26 +142,23 @@ public class FluidSimulatorGPGPU : FluidSimulator
 
 	protected override void setExternal(FluidCellIndex index, FluidCell applyCell)
 	{
-		// Compute shader works in transpose order of how these buffers are setup.
-		externalAdditions[index.y, index.x].density = applyCell.density;
-		externalAdditions[index.y, index.x].velocity = applyCell.velocity;
+		externalAdditions[index.x, index.y].density = applyCell.density;
+		externalAdditions[index.x, index.y].velocity = applyCell.velocity;
 	}
 
 	protected override FluidCell getExternal(FluidCellIndex index)
 	{
-		// Compute shader works in transpose order of how these buffers are setup.
-		return externalAdditions[index.y, index.x];
+		return externalAdditions[index.x, index.y];
 	}
 
 	protected override FluidCell getCell(FluidCellIndex index)
 	{
-		return cells[index.x, index.y].cell;
+		return inCells[index.x, index.y];
 	}
 
 	protected override FluidCellOperationData getCellOperationData(FluidCellIndex index)
 	{
-		// Compute shader works in transpose order of how these buffers are setup.
-		return operationData[index.y, index.x];
+		return operationData[index.x, index.y];
 	}
 
 	protected override void applyExternalAdditions()
@@ -219,7 +175,6 @@ public class FluidSimulatorGPGPU : FluidSimulator
 	protected override void diffuse()
 	{
 		float dtDiffusion = (info.operationParameters.diffusionRate * Time.deltaTime * info.fluidParameters.gridSize * info.fluidParameters.gridSize) / info.operationParameters.relaxationIterations;
-		//Debug.Log("GPGPU " + dtDiffusion);
 
 		fluidComputer.SetFloat("diffusionRate", dtDiffusion);
 		fluidComputer.SetBuffer(diffuseKernel, "inBuffer", inFluidBuffer);
@@ -273,38 +228,9 @@ public class FluidSimulatorGPGPU : FluidSimulator
 		fluidComputer.Dispatch(zeroedBoundariesKernel, threadGroups[0], 1, 1);
 	}
 
-	protected override void applyCells()
+	protected override void sendCellsToRenderer()
 	{
-		// TODO Should we just store this array as a member instead of just creating a new on?
-		//		Not sure about the time-memory tradeoff of it.
-		FluidCell[,] updatedCells = new FluidCell[info.fluidParameters.gridSize, info.fluidParameters.gridSize];
-		inFluidBuffer.GetData(updatedCells);
-
-		operationDataBuffer.GetData(operationData);
-
-		//Profiler.BeginSample("ApplyCells");
-		// Apply cell data to renderers as (j, i) -> (x, y)
-		// TODO Make this work in 3D
-		for (int i = 0; i < info.fluidParameters.gridSize; i++)
-		{
-			for (int j = 0; j < info.fluidParameters.gridSize; j++)
-			{
-				int x = j;
-				int y = i;
-				cells[x, y].cell.density = updatedCells[i, j].density;
-				cells[x, y].cell.velocity = updatedCells[i, j].velocity;
-
-				//cells[x, y].diffuseData = diffuseData[i, j];
-				//cells[x, y].advectData = advectData[i, j];
-
-				// TODO add global denisty to base fluid pool.
-				//globalDensity += updatedCells[i, j].color.a;
-
-				//cellRenderers[x, y].Data = new Vector4(updatedCells[i, j].velocity.x, updatedCells[i, j].velocity.y, updatedCells[i, j].velocity.z, updatedCells[i, j].density);
-			}
-		}
-		//Debug.Log(cellRenderers[0, 0].cell.density);
-		//Profiler.EndSample();
+		renderer.RenderCells(inFluidBuffer);
 	}
 
 	protected override void reset()

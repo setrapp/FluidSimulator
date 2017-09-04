@@ -861,12 +861,12 @@ Prefab:
       propertyPath: m_RootOrder
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 114202064563080440, guid: 528202cec4974904eb4df89408fa4cfa,
+    - target: {fileID: 114057362080539444, guid: 528202cec4974904eb4df89408fa4cfa,
         type: 2}
       propertyPath: info.fluidParameters.container
       value: 
       objectReference: {fileID: 1026398945}
-    - target: {fileID: 114057362080539444, guid: 528202cec4974904eb4df89408fa4cfa,
+    - target: {fileID: 114202064563080440, guid: 528202cec4974904eb4df89408fa4cfa,
         type: 2}
       propertyPath: info.fluidParameters.container
       value: 
@@ -877,17 +877,8 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 114105785418012140, guid: 528202cec4974904eb4df89408fa4cfa,
         type: 2}
-      propertyPath: mode
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1313270380478682, guid: 528202cec4974904eb4df89408fa4cfa, type: 2}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114105785418012140, guid: 528202cec4974904eb4df89408fa4cfa,
-        type: 2}
-      propertyPath: m_Enabled
-      value: 1
+      propertyPath: simulatorMode
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 528202cec4974904eb4df89408fa4cfa, type: 2}

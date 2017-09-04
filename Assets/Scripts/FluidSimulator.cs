@@ -97,7 +97,7 @@ public abstract class FluidSimulator : MonoBehaviour
 	public bool autoSimulate = true;
 
 	public FluidSimulatorInfo info;
-	protected FluidPool pool;
+	new protected FluidPool renderer;
 	FluidOperationPass[] operations;
 	protected int operationPassNumber = 0;
 	public float CellSize { get; private set; }
@@ -122,7 +122,6 @@ public abstract class FluidSimulator : MonoBehaviour
 
 	}
 
-	protected abstract string generatePoolCells();
 	protected abstract string initializeBuffers();
 	protected abstract void addExternal(FluidCellIndex index, float densityChange, float densityChangeRadius, Vector3 force, float forceRadius);
 	protected abstract void setExternal(FluidCellIndex index, FluidCell applyCell);
@@ -137,49 +136,33 @@ public abstract class FluidSimulator : MonoBehaviour
 	protected abstract void removeDivergence();
 	protected abstract void clampData();
 	protected abstract void emptyBoundaries();
-	protected abstract void applyCells();
+	protected abstract void sendCellsToRenderer();
 	protected abstract void prepareNextFrame();
 	protected abstract void swapBuffers();
 	protected abstract void reset();
 	protected abstract void pause();
 	protected abstract void step();
 
-	public bool Initialize(string familyName)
+	public bool Initialize(string familyName, FluidPool renderer)
 	{
 		this.familyName = familyName;
 		string result = null;
 		BeginSimulatorProfilerSample();
 		Profiler.BeginSample("Initialize");
 
-		if (pool != null)
+		if (this.renderer != null)
 		{
 			result = "Attempting to re-initialize a FluidSimulator";
 		}
 
-		Profiler.BeginSample("GeneratePoolCells");
-		if (info.fluidParameters.container == null)
-		{
-			info.fluidParameters.container = transform;
-		}
-		GameObject poolObject = new GameObject();
-		poolObject.transform.parent = info.fluidParameters.container;
-		poolObject.name = string.Format("{0} Pool", familyName);
-		pool = poolObject.AddComponent<FluidPool>();
-		pool.simulator = this;
-
-		gameObject.name = string.Format("{0} Simulator", familyName);
-		pool.gameObject.name = string.Format("{0} Pool", familyName);
-
-		CellSize = info.fluidParameters.physicalSize / info.fluidParameters.gridSize;
-
 		if (string.IsNullOrEmpty(result))
 		{
-			result = generatePoolCells();
-			if (!string.IsNullOrEmpty(result))
-			{
-				EndSimulatorProfilerSample();
-				result = string.Format("Failed to generate pool cells: {0}", result);
-			}
+			CellSize = info.fluidParameters.physicalSize / info.fluidParameters.gridSize;
+			info.fluidParameters.container = info.fluidParameters.container ?? transform;
+			this.renderer = renderer;
+			this.renderer.transform.parent = info.fluidParameters.container;
+			this.renderer.gameObject.name = string.Format("{0} Renderer", familyName);
+			result = this.renderer.Initialize(this);
 		}
 
 		Profiler.BeginSample("InitializeBuffers");
@@ -212,11 +195,6 @@ public abstract class FluidSimulator : MonoBehaviour
 
 	public void Simulate()
 	{
-		if (pool == null)
-		{
-			return;
-		}
-
 		BeginSimulatorProfilerSample();
 
 		#region Simulation Controls
@@ -246,7 +224,7 @@ public abstract class FluidSimulator : MonoBehaviour
 
 		OrderOperations();
 		PerformFluidOperations();
-		ApplyCells();
+		SendCellsToRenderer();
 		PrepareNextFrame();
 
 		EndSimulatorProfilerSample();
@@ -413,10 +391,15 @@ public abstract class FluidSimulator : MonoBehaviour
 		Profiler.EndSample();
 	}
 
-	void ApplyCells()
+	void SendCellsToRenderer()
 	{
-		Profiler.BeginSample("ApplyCells");
-		applyCells();
+		if (renderer == null)
+		{
+			return;
+		}
+
+		Profiler.BeginSample("SendCellsToRender");
+		sendCellsToRenderer();
 		Profiler.EndSample();
 	}
 

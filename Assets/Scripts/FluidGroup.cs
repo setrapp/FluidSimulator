@@ -44,7 +44,7 @@ public class FluidGroup : MonoBehaviour
 
 		foreach(var member in members)
 		{
-			member.Simulator.Initialize(member.FamilyName);
+			member.Simulator.Initialize(member.FamilyName, member.Renderer);
 			member.Simulator.autoSimulate = false;
 		}
 	}
