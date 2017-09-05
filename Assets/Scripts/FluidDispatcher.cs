@@ -15,6 +15,8 @@ public class FluidDispatcher : MonoBehaviour {
 	public FluidRenderer Renderer { get { return renderer; } }
 	[SerializeField]
 	FluidRendererObjects objectsRenderer;
+	[SerializeField]
+	FluidRendererTexture textureRenderer;
 
 	public bool initializeOnStart = true;
 	public string FamilyName { get; private set; }
@@ -27,7 +29,8 @@ public class FluidDispatcher : MonoBehaviour {
 
 	public enum RendererMode
 	{
-		OBJECTS = 0
+		OBJECTS = 0,
+		TEXTURE
 	}
 
 	void Awake()
@@ -59,8 +62,14 @@ public class FluidDispatcher : MonoBehaviour {
 			case RendererMode.OBJECTS:
 				renderer = objectsRenderer;
 				if (objectsRenderer != null) { objectsRenderer.gameObject.SetActive(true); }
-				else { throw new System.NullReferenceException(string.Format(nullReference, "CPU", "FluidSimulator")); }
-				// TODO Destroy other renderer if (gpgpuSimulator != null) { Destroy(gpgpuSimulator.gameObject); }
+				else { throw new System.NullReferenceException(string.Format(nullReference, "Objects Renderer")); }
+				if (textureRenderer != null) { Destroy(textureRenderer.gameObject); }
+				break;
+			case RendererMode.TEXTURE:
+				renderer = textureRenderer;
+				if (textureRenderer != null) { textureRenderer.gameObject.SetActive(true); }
+				else { throw new System.NullReferenceException(string.Format(nullReference, "Texture Renderer")); }
+				if (objectsRenderer != null) { Destroy(objectsRenderer.gameObject); }
 				break;
 		}
 	}

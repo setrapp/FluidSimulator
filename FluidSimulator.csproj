@@ -88,10 +88,12 @@
     <Compile Include="Assets\Scripts\FluidGroup.cs" />
     <Compile Include="Assets\Scripts\FluidRenderer.cs" />
     <Compile Include="Assets\Scripts\FluidRendererObjects.cs" />
+    <Compile Include="Assets\Scripts\FluidRendererTexture.cs" />
     <Compile Include="Assets\Scripts\FluidSimulator.cs" />
     <Compile Include="Assets\Scripts\FluidSimulatorCPU.cs" />
     <Compile Include="Assets\Scripts\FluidSimulatorGPGPU.cs" />
     <Compile Include="Assets\Scripts\FluidSimulatorMouseInput.cs" />
+    <Compile Include="Assets\Scripts\IRenderBuffer.cs" />
     <Compile Include="Assets\Scripts\IRenderArray.cs" />
   </ItemGroup>
   <ItemGroup>

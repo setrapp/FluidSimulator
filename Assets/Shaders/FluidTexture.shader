@@ -3,7 +3,7 @@
 	Properties
 	{
 		_MainTex ("Texture", 2D) = "white" {}
-		_TextureSize("Texture Size", Vector) = (0, 0, 0, 0)
+		_TextureSize ("Texture Size", Vector) = (0, 0, 0, 0)
 	}
 	SubShader
 	{
@@ -13,6 +13,12 @@
 		Pass
 		{
 			CGPROGRAM
+
+			#define Z_STEP 1
+			#define Y_STEP (Z_STEP * _TextureSize.z)
+			#define X_STEP (Y_STEP * _TextureSize.y)
+			#define INDEX(id) (id.x * X_STEP) + (id.y * Y_STEP) + (id.z * Z_STEP)
+
 			#pragma vertex vert
 			#pragma fragment frag
 			
@@ -42,6 +48,8 @@
 
 			sampler2D _MainTex;
 			float4 _MainTex_ST;
+			float4 _TextureSize;
+			StructuredBuffer<FluidCell> _FluidCells;
 			
 			v2f vert (appdata v)
 			{
@@ -54,9 +62,9 @@
 				return o;
 			}
 			
-			fixed4 frag (v2f i) : SV_Target
+			float4 frag (v2f i) : SV_Target
 			{
-				fixed4 color = float4(i.pixelIndex / _TextureSize.xy, 0, 1);
+				float4 color = float4(i.uv, 0, 1);
 				return color;
 			}
 			ENDCG

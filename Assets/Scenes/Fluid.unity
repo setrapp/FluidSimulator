@@ -875,9 +875,8 @@ Prefab:
       propertyPath: m_Name
       value: Lonely Fluid Dispatcher
       objectReference: {fileID: 0}
-    - target: {fileID: 114105785418012140, guid: 528202cec4974904eb4df89408fa4cfa,
-        type: 2}
-      propertyPath: simulatorMode
+    - target: {fileID: 1313270380478682, guid: 528202cec4974904eb4df89408fa4cfa, type: 2}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -1248,6 +1247,10 @@ Prefab:
       propertyPath: mode
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1313270380478682, guid: 528202cec4974904eb4df89408fa4cfa, type: 2}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 528202cec4974904eb4df89408fa4cfa, type: 2}
   m_IsPrefabParent: 0
@@ -1256,11 +1259,66 @@ Transform:
   m_PrefabParentObject: {fileID: 4779417816499178, guid: 528202cec4974904eb4df89408fa4cfa,
     type: 2}
   m_PrefabInternal: {fileID: 1045642451}
+--- !u!1001 &1415707714
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 1998456503}
+    m_Modifications:
+    - target: {fileID: 4779417816499178, guid: 528202cec4974904eb4df89408fa4cfa, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 4779417816499178, guid: 528202cec4974904eb4df89408fa4cfa, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4779417816499178, guid: 528202cec4974904eb4df89408fa4cfa, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4779417816499178, guid: 528202cec4974904eb4df89408fa4cfa, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4779417816499178, guid: 528202cec4974904eb4df89408fa4cfa, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4779417816499178, guid: 528202cec4974904eb4df89408fa4cfa, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4779417816499178, guid: 528202cec4974904eb4df89408fa4cfa, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4779417816499178, guid: 528202cec4974904eb4df89408fa4cfa, type: 2}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1313270380478682, guid: 528202cec4974904eb4df89408fa4cfa, type: 2}
+      propertyPath: m_Name
+      value: Experimental Fluid Dispatcher
+      objectReference: {fileID: 0}
+    - target: {fileID: 114105785418012140, guid: 528202cec4974904eb4df89408fa4cfa,
+        type: 2}
+      propertyPath: rendererMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1313270380478682, guid: 528202cec4974904eb4df89408fa4cfa, type: 2}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 100100000, guid: 528202cec4974904eb4df89408fa4cfa, type: 2}
+  m_IsPrefabParent: 0
 --- !u!4 &1430784589 stripped
 Transform:
   m_PrefabParentObject: {fileID: 4779417816499178, guid: 528202cec4974904eb4df89408fa4cfa,
     type: 2}
-  m_PrefabInternal: {fileID: 1509840312}
+  m_PrefabInternal: {fileID: 1415707714}
 --- !u!1 &1463877838
 GameObject:
   m_ObjectHideFlags: 0
@@ -1413,63 +1471,8 @@ CanvasRenderer:
 MonoBehaviour:
   m_PrefabParentObject: {fileID: 114105785418012140, guid: 528202cec4974904eb4df89408fa4cfa,
     type: 2}
-  m_PrefabInternal: {fileID: 1509840312}
+  m_PrefabInternal: {fileID: 1415707714}
   m_Script: {fileID: 11500000, guid: 3a22ca2e54e7548478764b36d67afa6c, type: 3}
---- !u!1001 &1509840312
-Prefab:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 1998456503}
-    m_Modifications:
-    - target: {fileID: 4779417816499178, guid: 528202cec4974904eb4df89408fa4cfa, type: 2}
-      propertyPath: m_LocalPosition.x
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 4779417816499178, guid: 528202cec4974904eb4df89408fa4cfa, type: 2}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4779417816499178, guid: 528202cec4974904eb4df89408fa4cfa, type: 2}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4779417816499178, guid: 528202cec4974904eb4df89408fa4cfa, type: 2}
-      propertyPath: m_LocalRotation.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4779417816499178, guid: 528202cec4974904eb4df89408fa4cfa, type: 2}
-      propertyPath: m_LocalRotation.y
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4779417816499178, guid: 528202cec4974904eb4df89408fa4cfa, type: 2}
-      propertyPath: m_LocalRotation.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4779417816499178, guid: 528202cec4974904eb4df89408fa4cfa, type: 2}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4779417816499178, guid: 528202cec4974904eb4df89408fa4cfa, type: 2}
-      propertyPath: m_RootOrder
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1313270380478682, guid: 528202cec4974904eb4df89408fa4cfa, type: 2}
-      propertyPath: m_Name
-      value: Experimental Fluid Dispatcher
-      objectReference: {fileID: 0}
-    - target: {fileID: 1313270380478682, guid: 528202cec4974904eb4df89408fa4cfa, type: 2}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114105785418012140, guid: 528202cec4974904eb4df89408fa4cfa,
-        type: 2}
-      propertyPath: mode
-      value: 1
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_ParentPrefab: {fileID: 100100000, guid: 528202cec4974904eb4df89408fa4cfa, type: 2}
-  m_IsPrefabParent: 0
 --- !u!1 &1677894227
 GameObject:
   m_ObjectHideFlags: 0
@@ -1987,7 +1990,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1998456502
 MonoBehaviour:
   m_ObjectHideFlags: 0

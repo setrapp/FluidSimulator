@@ -42,11 +42,15 @@ public abstract class FluidRenderer : MonoBehaviour
 		}
 
 		Profiler.BeginSample("FluidRenderer.RenderCells");
-		if ((IRenderArray)this != null)
+		if (this is IRenderArray)
 		{
 			((IRenderArray)this).RenderCells(cells);
 		}
-		// TODO Handle Buffer Renderer
+		else if(this is IRenderBuffer)
+		{
+			TranslateCellsToBuffer(cells);
+			((IRenderBuffer)this).RenderCells(temporaryCellBuffer);
+		}
 		else
 		{
 			Debug.LogError(noRenderingDefinition, this);
@@ -63,12 +67,15 @@ public abstract class FluidRenderer : MonoBehaviour
 		}
 
 		Profiler.BeginSample("FluidRenderer.RenderCells");
-		if ((IRenderArray)this != null)
+		if (this is IRenderArray)
 		{
 			TranslateCellsToArray(cells);
 			((IRenderArray)this).RenderCells(temporaryCellArray);
 		}
-		// TODO Handle Buffer Renderer
+		else if (this is IRenderBuffer)
+		{
+			((IRenderBuffer)this).RenderCells(cells);
+		}
 		else
 		{
 			Debug.LogError(noRenderingDefinition, this);

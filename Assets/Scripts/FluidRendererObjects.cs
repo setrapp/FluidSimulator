@@ -30,7 +30,7 @@ public class FluidRendererObjects : FluidRenderer, IRenderArray
 		}
 		else
 		{
-			result = string.Format("No Cell Prefab provided to {0}'s pool.", gameObject.name);
+			result = string.Format("No Cell Prefab provided to {0}'s renderer.", gameObject.name);
 		}
 
 		return result;
