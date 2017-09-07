@@ -1251,6 +1251,11 @@ Prefab:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 114105785418012140, guid: 528202cec4974904eb4df89408fa4cfa,
+        type: 2}
+      propertyPath: simulatorMode
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 528202cec4974904eb4df89408fa4cfa, type: 2}
   m_IsPrefabParent: 0
@@ -1309,6 +1314,11 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1313270380478682, guid: 528202cec4974904eb4df89408fa4cfa, type: 2}
       propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114105785418012140, guid: 528202cec4974904eb4df89408fa4cfa,
+        type: 2}
+      propertyPath: simulatorMode
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -2021,7 +2031,7 @@ MonoBehaviour:
       cellMass: 1
     operationParameters:
       boundaryCondition: 0
-      diffusionRate: 0.05
+      diffusionRate: 0.005
       relaxationIterations: 20
     operationFlags:
       applyExternals: 1

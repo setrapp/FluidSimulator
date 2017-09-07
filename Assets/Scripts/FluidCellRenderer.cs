@@ -2,6 +2,7 @@
 using System.Runtime.InteropServices;
 using UnityEngine;
 
+[RequireComponent(typeof(FluidColliderCell))]
 public class FluidCellRenderer : MonoBehaviour {
 
 	[SerializeField]
@@ -15,6 +16,8 @@ public class FluidCellRenderer : MonoBehaviour {
 	[SerializeField]
 	FluidSimulator simulator;
 	public FluidSimulator Simulator { get { return simulator; } }
+
+	// TODO Use FluidCellIndex here
 	public int XIndex { get; private set; }
 	public int YIndex { get; private set; }
 
@@ -35,7 +38,7 @@ public class FluidCellRenderer : MonoBehaviour {
 			rawDivergence = cellTemplate.rawDivergence,
 			relaxedDivergence = cellTemplate.relaxedDivergence,
 		};
-
+		GetComponent<FluidColliderCell>().Initialize(simulator, new FluidCellIndex(xIndex, yIndex, 0));
 	}
 
 	void Start()

@@ -83,6 +83,8 @@
     <Compile Include="Assets\Scripts\FluidCell.cs" />
     <Compile Include="Assets\Scripts\FluidCellOperationData.cs" />
     <Compile Include="Assets\Scripts\FluidCellRenderer.cs" />
+    <Compile Include="Assets\Scripts\FluidCollider.cs" />
+    <Compile Include="Assets\Scripts\FluidColliderCell.cs" />
     <Compile Include="Assets\Scripts\FluidDebug.cs" />
     <Compile Include="Assets\Scripts\FluidDispatcher.cs" />
     <Compile Include="Assets\Scripts\FluidGroup.cs" />
