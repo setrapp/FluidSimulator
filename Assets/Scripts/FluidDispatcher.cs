@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 
 public class FluidDispatcher : MonoBehaviour {
 
@@ -7,16 +7,20 @@ public class FluidDispatcher : MonoBehaviour {
 	FluidSimulator simulator;
 	public FluidSimulator Simulator { get { return simulator; } }
 	[SerializeField]
+	List<SimulatorOption> simulatorOptions;
+	/*[SerializeField]
 	FluidSimulator cpuSimulator;
 	[SerializeField]
-	FluidSimulator gpgpuSimulator;
+	FluidSimulator gpgpuSimulator;*/
 	public RendererMode rendererMode = RendererMode.OBJECTS;
 	new FluidRenderer renderer;
 	public FluidRenderer Renderer { get { return renderer; } }
 	[SerializeField]
+	List<RendererOption> rendererOptions;
+	/*[SerializeField]
 	FluidRendererObjects objectsRenderer;
 	[SerializeField]
-	FluidRendererTexture textureRenderer;
+	FluidRendererTexture textureRenderer;*/
 
 	public bool initializeOnStart = true;
 	public string FamilyName { get; private set; }
@@ -33,44 +37,63 @@ public class FluidDispatcher : MonoBehaviour {
 		TEXTURE
 	}
 
+	[System.Serializable]
+	private class SimulatorOption
+	{
+		public SimulatorMode mode;
+		public FluidSimulator simulator;
+	}
+
+	[System.Serializable]
+	private class RendererOption
+	{
+		public RendererMode mode;
+		public FluidRenderer renderer;
+	}
+
 	void Awake()
 	{
 		FamilyName = name.Substring(0, name.IndexOf("Dispatcher")).TrimEnd();
 		gameObject.name = string.Format("{0} Dispatcher", FamilyName);
 
-		// TODO genericify the enabling and destroying of mode options and move to arrays
+		string nullReference = "Attempting to use {0} {1} that does not exist.";
 
-		string nullReference = "Attempting to use {0} that does not exist.";
-		switch (simulatorMode)
+		for (int i = 0; i < simulatorOptions.Count; i++)
 		{
-			case SimulatorMode.CPU:
-				simulator = cpuSimulator;
-				if (cpuSimulator != null) { cpuSimulator.gameObject.SetActive(true); }
-				else { throw new System.NullReferenceException(string.Format(nullReference, "CPU FluidSimulator")); }
-				if (gpgpuSimulator != null) { Destroy(gpgpuSimulator.gameObject); }
-				break;
-			case SimulatorMode.GPGPU:
-				simulator = gpgpuSimulator;
-				if (gpgpuSimulator != null) { gpgpuSimulator.gameObject.SetActive(true); }
-				else { throw new System.NullReferenceException(string.Format(nullReference, "GPGPU FluidSimulator")); }
-				if (cpuSimulator != null) { Destroy(cpuSimulator.gameObject); }
-				break;
+			if (simulator == null && simulatorOptions[i].mode == simulatorMode)
+			{
+				simulator = simulatorOptions[i].simulator;
+				simulator.gameObject.SetActive(true);
+			}
+			else
+			{
+				Destroy(simulatorOptions[i].simulator.gameObject);
+				simulatorOptions.RemoveAt(i);
+				i--;
+			}
+		}
+		if (simulator == null)
+		{
+			throw new System.NullReferenceException(string.Format(nullReference, simulatorMode, "Simulator"));
 		}
 
-		switch (rendererMode)
+		for (int i = 0; i < rendererOptions.Count; i++)
 		{
-			case RendererMode.OBJECTS:
-				renderer = objectsRenderer;
-				if (objectsRenderer != null) { objectsRenderer.gameObject.SetActive(true); }
-				else { throw new System.NullReferenceException(string.Format(nullReference, "Objects Renderer")); }
-				if (textureRenderer != null) { Destroy(textureRenderer.gameObject); }
-				break;
-			case RendererMode.TEXTURE:
-				renderer = textureRenderer;
-				if (textureRenderer != null) { textureRenderer.gameObject.SetActive(true); }
-				else { throw new System.NullReferenceException(string.Format(nullReference, "Texture Renderer")); }
-				if (objectsRenderer != null) { Destroy(objectsRenderer.gameObject); }
-				break;
+			if (renderer == null && rendererOptions[i].mode == rendererMode)
+			{
+				renderer = rendererOptions[i].renderer;
+				renderer.gameObject.SetActive(true);
+			}
+			else
+			{
+				Destroy(rendererOptions[i].renderer.gameObject);
+				rendererOptions.RemoveAt(i);
+				i--;
+			}
+		}
+		if (renderer == null)
+		{
+			throw new System.NullReferenceException(string.Format(nullReference, rendererMode, "Renderer"));
 		}
 	}
 

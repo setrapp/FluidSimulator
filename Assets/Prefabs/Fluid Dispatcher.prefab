@@ -234,7 +234,7 @@ MonoBehaviour:
   info:
     fluidParameters:
       container: {fileID: 0}
-      gridSize: 64
+      gridSize: 128
       physicalSize: 16
     cellParameters:
       defaultCell:
@@ -248,7 +248,7 @@ MonoBehaviour:
     operationParameters:
       boundaryCondition: 0
       diffusionRate: 0.0005
-      relaxationIterations: 5
+      relaxationIterations: 20
     operationFlags:
       applyExternals: 1
       diffuse: 1
@@ -288,12 +288,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a22ca2e54e7548478764b36d67afa6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  simulatorMode: 1
-  cpuSimulator: {fileID: 114202064563080440}
-  gpgpuSimulator: {fileID: 114057362080539444}
-  rendererMode: 1
-  objectsRenderer: {fileID: 114072744174383932}
-  textureRenderer: {fileID: 114119536707047830}
+  simulatorMode: 0
+  simulatorOptions:
+  - mode: 0
+    simulator: {fileID: 114202064563080440}
+  - mode: 1
+    simulator: {fileID: 114057362080539444}
+  rendererMode: 0
+  rendererOptions:
+  - mode: 0
+    renderer: {fileID: 114072744174383932}
+  - mode: 1
+    renderer: {fileID: 114119536707047830}
   initializeOnStart: 1
 --- !u!114 &114119536707047830
 MonoBehaviour:
