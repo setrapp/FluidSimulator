@@ -1,17 +1,12 @@
 ﻿using UnityEngine;
 
-[RequireComponent(typeof(MeshRenderer))]
+[RequireComponent(typeof(MeshRenderer)), RequireComponent(typeof(FluidColliderBox))]
 public class FluidRendererTexture : FluidRenderer, IRenderBuffer
 {
 	[SerializeField]
-	Material operationsMaterial;
+	Material operationsMaterial;	// TODO Rename this.
 	RenderTexture cellsTexture;
 	MeshRenderer mesh;
-
-	void Start()
-	{
-		mesh = GetComponent<MeshRenderer>();
-	}
 
 	protected override string generateCells()
 	{
@@ -27,8 +22,9 @@ public class FluidRendererTexture : FluidRenderer, IRenderBuffer
 		}
 		else if (operationsMaterial == null)
 		{
-			result = string.Format("{0} has now attached Cells Material", gameObject.name);
+			result = string.Format("{0} has no attached Cells Material", gameObject.name);
 		}
+		// TODO Either prevent reinitalizing or handle it.
 
 		// Texture must be power-of-two.
 		if (string.IsNullOrEmpty(result))
@@ -39,8 +35,10 @@ public class FluidRendererTexture : FluidRenderer, IRenderBuffer
 			cellsTexture.Create();
 
 			operationsMaterial.SetVector("_TextureSize", new Vector4(gridSize, gridSize, 1, 0));
+			mesh = GetComponent<MeshRenderer>();
 			mesh.material.SetTexture("_MainTex", cellsTexture);
 			mesh.transform.localScale = new Vector3(physicalSize, physicalSize, physicalSize);
+			GetComponent<FluidColliderBox>().Initialize(Simulator);
 		}
 
 		return result;
@@ -49,6 +47,8 @@ public class FluidRendererTexture : FluidRenderer, IRenderBuffer
 	void IRenderBuffer.RenderCells(ComputeBuffer fluidCells)
 	{
 		operationsMaterial.SetBuffer("_FluidCells", fluidCells);
+		operationsMaterial.SetFloat("_MaxDensity", Simulator.info.cellParameters.cellMaxDensity);
+		operationsMaterial.SetFloat("_MaxSpeed", Simulator.info.cellParameters.cellMaxSpeed);
 		Graphics.Blit(cellsTexture, cellsTexture, operationsMaterial);
 	}
 

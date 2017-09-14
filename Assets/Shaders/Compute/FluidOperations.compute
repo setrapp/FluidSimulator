@@ -7,7 +7,7 @@
 #pragma kernel RemoveDivergence
 #pragma kernel EmptyBoundaries
 
-#define X_THREADS 2
+#define X_THREADS 2	// TODO try these at something like 8
 #define Y_THREADS 2
 #define Z_THREADS 1
 

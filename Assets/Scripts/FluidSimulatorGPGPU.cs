@@ -104,7 +104,13 @@ public class FluidSimulatorGPGPU : FluidSimulator
 	protected override void prepareNextFrame()
 	{
 		externalAdditionBuffer.SetData(initialCells);
-		externalAdditionBuffer.GetData(externalAdditions);
+		for (int i = 0; i < info.fluidParameters.gridSize; i++)
+		{
+			for (int j = 0; j < info.fluidParameters.gridSize; j++)
+			{
+				externalAdditions[i, j] = initialCells[i, j];
+			}
+		}
 	}
 
 	protected override void addExternal(FluidCellIndex index, float densityChange, float densityChangeRadius, Vector3 force, float forceRadius)

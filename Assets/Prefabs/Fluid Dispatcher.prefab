@@ -38,6 +38,8 @@ GameObject:
   - component: {fileID: 33963476292834440}
   - component: {fileID: 23798124075594652}
   - component: {fileID: 114119536707047830}
+  - component: {fileID: 65849802318905974}
+  - component: {fileID: 114763311802827580}
   m_Layer: 0
   m_Name: Fluid Renderer Texture
   m_TagString: Untagged
@@ -201,6 +203,18 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1561098587310672}
   m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!65 &65849802318905974
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1561098587310672}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 6.1232336e-17}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &114057362080539444
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -220,7 +234,7 @@ MonoBehaviour:
   info:
     fluidParameters:
       container: {fileID: 0}
-      gridSize: 32
+      gridSize: 64
       physicalSize: 16
     cellParameters:
       defaultCell:
@@ -229,12 +243,12 @@ MonoBehaviour:
         rawDivergence: 0
         relaxedDivergence: 0
       cellMaxDensity: 1
-      cellMaxSpeed: 5
+      cellMaxSpeed: 1
       cellMass: 1
     operationParameters:
       boundaryCondition: 0
-      diffusionRate: 0.005
-      relaxationIterations: 20
+      diffusionRate: 0.0005
+      relaxationIterations: 5
     operationFlags:
       applyExternals: 1
       diffuse: 1
@@ -274,10 +288,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a22ca2e54e7548478764b36d67afa6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  simulatorMode: 0
+  simulatorMode: 1
   cpuSimulator: {fileID: 114202064563080440}
   gpgpuSimulator: {fileID: 114057362080539444}
-  rendererMode: 0
+  rendererMode: 1
   objectsRenderer: {fileID: 114072744174383932}
   textureRenderer: {fileID: 114119536707047830}
   initializeOnStart: 1
@@ -312,7 +326,7 @@ MonoBehaviour:
   info:
     fluidParameters:
       container: {fileID: 0}
-      gridSize: 32
+      gridSize: 16
       physicalSize: 16
     cellParameters:
       defaultCell:
@@ -341,3 +355,14 @@ MonoBehaviour:
       velocityVisible: 1
   cellPrefab: {fileID: 114000014195457748, guid: e41896cc43767fe4da5ca5c132ca5260,
     type: 2}
+--- !u!114 &114763311802827580
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1561098587310672}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf857d2c322d40e4482b6fe60f65cdbf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

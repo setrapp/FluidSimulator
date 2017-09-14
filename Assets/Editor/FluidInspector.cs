@@ -57,23 +57,29 @@ public class FluidInspector : Editor
 
 	void ShowCellData(string cellName, FluidSimulator simulator, FluidCellIndex cellIndex, ref bool showCell, bool showOperationData)
 	{
-		FluidCell cell = simulator.GetCell(cellIndex);
-
-		showCell = EditorGUILayout.Foldout(showCell, string.Format("{0} {1}", cellName, cellIndex.ToString()));
-		if (showCell)
+		return;
+		int gridSize = simulator.info.fluidParameters.gridSize;
+		if (cellIndex.x >= 0 && cellIndex.y >= 0 && cellIndex.z >= 0 &&
+			cellIndex.x < gridSize && cellIndex.y < gridSize && cellIndex.z < gridSize)
 		{
-			EditorGUILayout.LabelField("Density", "" + cell.density);
-			EditorGUILayout.LabelField("Velocity", "" + cell.velocity);
-			EditorGUILayout.LabelField("Raw Divergence", "" + cell.rawDivergence);
-			EditorGUILayout.LabelField("Relaxed Divergence", "" + cell.relaxedDivergence);
-			if(showOperationData)
+			FluidCell cell = simulator.GetCell(cellIndex);
+
+			showCell = EditorGUILayout.Foldout(showCell, string.Format("{0} {1}", cellName, cellIndex.ToString()));
+			if (showCell)
 			{
-				FluidCellOperationData operationData = simulator.GetCellOperationData(cellIndex);
-				EditorGUILayout.LabelField("Advect Index Velocity", "" + operationData.advectIdVelocity.ToString());
-				EditorGUILayout.LabelField("Advect Past Index", "" + operationData.advectPastId.ToString());
-				EditorGUILayout.LabelField("Advect SamplePercentages", "" + operationData.advectSamplePercentages);
+				EditorGUILayout.LabelField("Density", "" + cell.density);
+				EditorGUILayout.LabelField("Velocity", "" + cell.velocity);
+				EditorGUILayout.LabelField("Raw Divergence", "" + cell.rawDivergence);
+				EditorGUILayout.LabelField("Relaxed Divergence", "" + cell.relaxedDivergence);
+				if (showOperationData)
+				{
+					FluidCellOperationData operationData = simulator.GetCellOperationData(cellIndex);
+					EditorGUILayout.LabelField("Advect Index Velocity", "" + operationData.advectIdVelocity.ToString());
+					EditorGUILayout.LabelField("Advect Past Index", "" + operationData.advectPastId.ToString());
+					EditorGUILayout.LabelField("Advect SamplePercentages", "" + operationData.advectSamplePercentages);
+				}
+				EditorGUILayout.Space();
 			}
-			EditorGUILayout.Space();
 		}
 	}
 }
