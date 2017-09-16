@@ -53,7 +53,7 @@ public class FluidSimulatorGPGPU : FluidSimulator
 		// This assumes all kernels of c ompute shader use the same number of threads per group.
 		threadsPerGroup = new uint[3];
 		fluidComputer.GetKernelThreadGroupSizes(applyExternalsKernel, out threadsPerGroup[0], out threadsPerGroup[1], out threadsPerGroup[2]);
-		threadGroups = new int[] { (int)(info.fluidParameters.gridSize / threadsPerGroup[0]), (int)(info.fluidParameters.gridSize / threadsPerGroup[1]), (int)(info.fluidParameters.gridSize / threadsPerGroup[2]) };
+		threadGroups = new int[] { (int)(fluidParameters.gridSize / threadsPerGroup[0]), (int)(fluidParameters.gridSize / threadsPerGroup[1]), (int)(fluidParameters.gridSize / threadsPerGroup[2]) };
 
 		// TODO When 3D is added this can be removed.
 		threadGroups[2] = 1;
@@ -65,13 +65,13 @@ public class FluidSimulatorGPGPU : FluidSimulator
 		Debug.Log("Threads per Group: " + threadsPerGroup[0] + " " + threadsPerGroup[1] + " " + threadsPerGroup[2]);
 		Debug.Log("Thread Groups: " + threadGroups[0] + " " + threadGroups[1] + " " + threadGroups[2]);
 
-		initialCells = new FluidCell[info.fluidParameters.gridSize, info.fluidParameters.gridSize];
-		externalAdditions = new FluidCell[info.fluidParameters.gridSize, info.fluidParameters.gridSize];
-		operationData = new FluidCellOperationData[info.fluidParameters.gridSize, info.fluidParameters.gridSize];
+		initialCells = new FluidCell[fluidParameters.gridSize, fluidParameters.gridSize];
+		externalAdditions = new FluidCell[fluidParameters.gridSize, fluidParameters.gridSize];
+		operationData = new FluidCellOperationData[fluidParameters.gridSize, fluidParameters.gridSize];
 
-		for (int i = 0; i < info.fluidParameters.gridSize; i++)
+		for (int i = 0; i < fluidParameters.gridSize; i++)
 		{
-			for (int j = 0; j < info.fluidParameters.gridSize; j++)
+			for (int j = 0; j < fluidParameters.gridSize; j++)
 			{
 				initialCells[i, j] = new FluidCell();
 				externalAdditions[i, j] = new FluidCell();
@@ -80,23 +80,23 @@ public class FluidSimulatorGPGPU : FluidSimulator
 		}
 
 		int cellStride = Marshal.SizeOf(new FluidCell());
-		fluidBuffer1 = new ComputeBuffer(info.fluidParameters.gridSize * info.fluidParameters.gridSize, cellStride);
+		fluidBuffer1 = new ComputeBuffer(fluidParameters.gridSize * fluidParameters.gridSize, cellStride);
 		fluidBuffer1.SetData(initialCells);
-		fluidBuffer2 = new ComputeBuffer(info.fluidParameters.gridSize * info.fluidParameters.gridSize, cellStride);
+		fluidBuffer2 = new ComputeBuffer(fluidParameters.gridSize * fluidParameters.gridSize, cellStride);
 		fluidBuffer2.SetData(initialCells);
 
 		inFluidBuffer = fluidBuffer1;
 		outFluidBuffer = fluidBuffer2;
 
-		externalAdditionBuffer = new ComputeBuffer(info.fluidParameters.gridSize * info.fluidParameters.gridSize, cellStride);
+		externalAdditionBuffer = new ComputeBuffer(fluidParameters.gridSize * fluidParameters.gridSize, cellStride);
 		externalAdditionBuffer.SetData(initialCells);
 
 		int operationDataStride = Marshal.SizeOf(new FluidCellOperationData());
-		operationDataBuffer = new ComputeBuffer(info.fluidParameters.gridSize * info.fluidParameters.gridSize, operationDataStride);
+		operationDataBuffer = new ComputeBuffer(fluidParameters.gridSize * fluidParameters.gridSize, operationDataStride);
 		operationDataBuffer.SetData(operationData);
 
-		fluidComputer.SetFloat("cellSize", CellSize);
-		fluidComputer.SetFloat("cellsPerSide", info.fluidParameters.gridSize);
+		fluidComputer.SetFloat("cellSize", cellParameters.cellSize);
+		fluidComputer.SetFloat("cellsPerSide", fluidParameters.gridSize);
 
 		return null;
 	}
@@ -104,9 +104,9 @@ public class FluidSimulatorGPGPU : FluidSimulator
 	protected override void prepareNextFrame()
 	{
 		externalAdditionBuffer.SetData(initialCells);
-		for (int i = 0; i < info.fluidParameters.gridSize; i++)
+		for (int i = 0; i < fluidParameters.gridSize; i++)
 		{
-			for (int j = 0; j < info.fluidParameters.gridSize; j++)
+			for (int j = 0; j < fluidParameters.gridSize; j++)
 			{
 				externalAdditions[i, j] = initialCells[i, j];
 			}
@@ -120,8 +120,8 @@ public class FluidSimulatorGPGPU : FluidSimulator
 			return;
 		}
 
-		int densityCellRadius = (int)Mathf.Max(densityChangeRadius / CellSize, 0);
-		int forceCellRadius = (int)Mathf.Max(forceRadius / CellSize, 0);
+		int densityCellRadius = (int)Mathf.Max(densityChangeRadius / cellParameters.cellSize, 0);
+		int forceCellRadius = (int)Mathf.Max(forceRadius / cellParameters.cellSize, 0);
 		int applyCellRadius = Mathf.Max(densityCellRadius, forceCellRadius);
 
 		float densityFalloff = densityChange / (densityCellRadius + 1);
@@ -129,9 +129,9 @@ public class FluidSimulatorGPGPU : FluidSimulator
 
 		// TODO We can calculate which cells should be affected in the compute shader. Though will it save us much?
 
-		for (int i = (int)Mathf.Max(index.x - applyCellRadius, 1); i < Mathf.Min(index.x + applyCellRadius + 1, info.fluidParameters.gridSize - 1); i++)
+		for (int i = (int)Mathf.Max(index.x - applyCellRadius, 1); i < Mathf.Min(index.x + applyCellRadius + 1, fluidParameters.gridSize - 1); i++)
 		{
-			for (int j = (int)Mathf.Max(index.y - applyCellRadius, 1); j < Mathf.Min(index.y + applyCellRadius + 1, info.fluidParameters.gridSize - 1); j++)
+			for (int j = (int)Mathf.Max(index.y - applyCellRadius, 1); j < Mathf.Min(index.y + applyCellRadius + 1, fluidParameters.gridSize - 1); j++)
 			{
 				int distance = Mathf.Max(Mathf.Abs(i - index.x), Mathf.Abs(j - index.y));
 				if (distance <= densityCellRadius)
@@ -180,7 +180,7 @@ public class FluidSimulatorGPGPU : FluidSimulator
 
 	protected override void diffuse()
 	{
-		float dtDiffusion = (info.operationParameters.diffusionRate * Time.deltaTime * info.fluidParameters.gridSize * info.fluidParameters.gridSize) / info.operationParameters.relaxationIterations;
+		float dtDiffusion = (operationParameters.diffusionRate * Time.deltaTime * fluidParameters.gridSize * fluidParameters.gridSize) / operationParameters.relaxationIterations;
 
 		fluidComputer.SetFloat("diffusionRate", dtDiffusion);
 		fluidComputer.SetBuffer(diffuseKernel, "inBuffer", inFluidBuffer);
@@ -220,8 +220,8 @@ public class FluidSimulatorGPGPU : FluidSimulator
 
 	protected override void clampData()
 	{
-		fluidComputer.SetFloat("maxDensity", info.cellParameters.cellMaxDensity);
-		fluidComputer.SetFloat("maxSpeed", info.cellParameters.cellMaxSpeed);
+		fluidComputer.SetFloat("maxDensity", cellParameters.cellMaxDensity);
+		fluidComputer.SetFloat("maxSpeed", cellParameters.cellMaxSpeed);
 		fluidComputer.SetBuffer(clampDataKernel, "inBuffer", inFluidBuffer);
 		fluidComputer.SetBuffer(clampDataKernel, "outBuffer", outFluidBuffer);
 		fluidComputer.Dispatch(clampDataKernel, threadGroups[0], threadGroups[1], threadGroups[2]);

@@ -231,36 +231,30 @@ MonoBehaviour:
   stepFluid: 0
   exclusiveProfile: 1
   autoSimulate: 1
-  info:
-    fluidParameters:
-      container: {fileID: 0}
-      gridSize: 128
-      physicalSize: 16
-    cellParameters:
-      defaultCell:
-        density: 0
-        velocity: {x: 0, y: 0, z: 0}
-        rawDivergence: 0
-        relaxedDivergence: 0
-      cellMaxDensity: 1
-      cellMaxSpeed: 1
-      cellMass: 1
-    operationParameters:
-      boundaryCondition: 0
-      diffusionRate: 0.0005
-      relaxationIterations: 20
-    operationFlags:
-      applyExternals: 1
-      diffuse: 1
-      advect: 1
-      handleDivergence: 1
-      clampData: 1
-    visualizationFlags:
-      solidVisible: 1
-      outlineVisible: 0
-      centerVisible: 0
-      densityVisible: 1
-      velocityVisible: 0
+  fluidParameters:
+    container: {fileID: 0}
+    gridSize: 16
+    physicalSize: 16
+  cellParameters:
+    defaultCell:
+      density: 0
+      velocity: {x: 0, y: 0, z: 0}
+      rawDivergence: 0
+      relaxedDivergence: 0
+    cellMaxDensity: 1
+    cellMaxSpeed: 20
+    cellMass: 1
+    cellSize: 1
+  operationParameters:
+    boundaryCondition: 0
+    diffusionRate: 0.05
+    relaxationIterations: 20
+  operationFlags:
+    applyExternals: 1
+    diffuse: 1
+    advect: 1
+    handleDivergence: 1
+    clampData: 1
   cellPrefab: {fileID: 114000014195457748, guid: e41896cc43767fe4da5ca5c132ca5260,
     type: 2}
   fluidComputer: {fileID: 7200000, guid: 2612196cd8877ab48930170b6ef5156f, type: 3}
@@ -275,6 +269,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ccf75bb6a1a7d234e96d978dfc1cd860, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fluidParameters:
+    container: {fileID: 0}
+    gridSize: 16
+    physicalSize: 16
+  cellParameters:
+    defaultCell:
+      density: 0
+      velocity: {x: 0, y: 0, z: 0}
+      rawDivergence: 0
+      relaxedDivergence: 0
+    cellMaxDensity: 1
+    cellMaxSpeed: 20
+    cellMass: 1
+    cellSize: 1
+  visualizationFlags:
+    solidVisible: 1
+    outlineVisible: 0
+    centerVisible: 0
+    densityVisible: 1
+    velocityVisible: 1
   cellPrefab: {fileID: 114000014195457748, guid: e41896cc43767fe4da5ca5c132ca5260,
     type: 2}
 --- !u!114 &114105785418012140
@@ -288,19 +302,50 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a22ca2e54e7548478764b36d67afa6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  simulatorMode: 0
+  simulatorMode: 1
   simulatorOptions:
   - mode: 0
     simulator: {fileID: 114202064563080440}
   - mode: 1
     simulator: {fileID: 114057362080539444}
-  rendererMode: 0
+  rendererMode: 1
   rendererOptions:
   - mode: 0
     renderer: {fileID: 114072744174383932}
   - mode: 1
     renderer: {fileID: 114119536707047830}
   initializeOnStart: 1
+  info:
+    fluidParameters:
+      container: {fileID: 0}
+      gridSize: 128
+      physicalSize: 16
+    cellParameters:
+      defaultCell:
+        density: 0
+        velocity: {x: 0, y: 0, z: 0}
+        rawDivergence: 0
+        relaxedDivergence: 0
+      cellMaxDensity: 1
+      cellMaxSpeed: 1
+      cellMass: 1
+      cellSize: 1
+    operationParameters:
+      boundaryCondition: 0
+      diffusionRate: 0.005
+      relaxationIterations: 20
+    operationFlags:
+      applyExternals: 1
+      diffuse: 1
+      advect: 1
+      handleDivergence: 1
+      clampData: 1
+    visualizationFlags:
+      solidVisible: 1
+      outlineVisible: 0
+      centerVisible: 0
+      densityVisible: 1
+      velocityVisible: 1
 --- !u!114 &114119536707047830
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -312,6 +357,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e26e14535e9f1c44b55e9f4fd5435a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fluidParameters:
+    container: {fileID: 0}
+    gridSize: 16
+    physicalSize: 16
+  cellParameters:
+    defaultCell:
+      density: 0
+      velocity: {x: 0, y: 0, z: 0}
+      rawDivergence: 0
+      relaxedDivergence: 0
+    cellMaxDensity: 1
+    cellMaxSpeed: 20
+    cellMass: 1
+    cellSize: 1
+  visualizationFlags:
+    solidVisible: 1
+    outlineVisible: 0
+    centerVisible: 0
+    densityVisible: 1
+    velocityVisible: 1
   operationsMaterial: {fileID: 2100000, guid: 732abfff353df784ea7bbc2fc064e0a7, type: 2}
 --- !u!114 &114202064563080440
 MonoBehaviour:
@@ -329,36 +394,30 @@ MonoBehaviour:
   stepFluid: 0
   exclusiveProfile: 1
   autoSimulate: 1
-  info:
-    fluidParameters:
-      container: {fileID: 0}
-      gridSize: 16
-      physicalSize: 16
-    cellParameters:
-      defaultCell:
-        density: 0
-        velocity: {x: 0, y: 0, z: 0}
-        rawDivergence: 0
-        relaxedDivergence: 0
-      cellMaxDensity: 1
-      cellMaxSpeed: 20
-      cellMass: 1
-    operationParameters:
-      boundaryCondition: 0
-      diffusionRate: 0.005
-      relaxationIterations: 20
-    operationFlags:
-      applyExternals: 1
-      diffuse: 1
-      advect: 1
-      handleDivergence: 1
-      clampData: 1
-    visualizationFlags:
-      solidVisible: 1
-      outlineVisible: 0
-      centerVisible: 0
-      densityVisible: 1
-      velocityVisible: 1
+  fluidParameters:
+    container: {fileID: 0}
+    gridSize: 16
+    physicalSize: 16
+  cellParameters:
+    defaultCell:
+      density: 0
+      velocity: {x: 0, y: 0, z: 0}
+      rawDivergence: 0
+      relaxedDivergence: 0
+    cellMaxDensity: 1
+    cellMaxSpeed: 20
+    cellMass: 1
+    cellSize: 1
+  operationParameters:
+    boundaryCondition: 0
+    diffusionRate: 0.05
+    relaxationIterations: 20
+  operationFlags:
+    applyExternals: 1
+    diffuse: 1
+    advect: 1
+    handleDivergence: 1
+    clampData: 1
   cellPrefab: {fileID: 114000014195457748, guid: e41896cc43767fe4da5ca5c132ca5260,
     type: 2}
 --- !u!114 &114763311802827580

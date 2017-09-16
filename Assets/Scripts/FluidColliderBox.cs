@@ -27,7 +27,7 @@ public class FluidColliderBox : FluidCollider
 		}
 
 		Vector3 localFocus = transform.InverseTransformPoint(focalPoint);
-		int gridSize = Simulator.info.fluidParameters.gridSize;
+		int gridSize = Simulator.fluidParameters.gridSize;
 		recentFoundIndex = new FluidCellIndex((int)((localFocus.x + 0.5f) * gridSize), (int)((localFocus.y + 0.5f) * gridSize), 0);
 		//Debug.Log(localFocus + " " + recentFoundIndex);
 		return recentFoundIndex;

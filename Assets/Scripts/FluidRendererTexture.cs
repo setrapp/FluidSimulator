@@ -11,9 +11,8 @@ public class FluidRendererTexture : FluidRenderer, IRenderBuffer
 	protected override string generateCells()
 	{
 		string result = null;
-		FluidSimulator.FluidSimulatorInfo info = Simulator.info;
-		int gridSize = info.fluidParameters.gridSize;
-		float physicalSize = info.fluidParameters.physicalSize;
+		int gridSize = fluidParameters.gridSize;
+		float physicalSize = fluidParameters.physicalSize;
 
 		bool isPowerOfTwo = (gridSize & (gridSize - 1)) == 0;
 		if (!isPowerOfTwo)
@@ -47,8 +46,8 @@ public class FluidRendererTexture : FluidRenderer, IRenderBuffer
 	void IRenderBuffer.RenderCells(ComputeBuffer fluidCells)
 	{
 		operationsMaterial.SetBuffer("_FluidCells", fluidCells);
-		operationsMaterial.SetFloat("_MaxDensity", Simulator.info.cellParameters.cellMaxDensity);
-		operationsMaterial.SetFloat("_MaxSpeed", Simulator.info.cellParameters.cellMaxSpeed);
+		operationsMaterial.SetFloat("_MaxDensity", Simulator.cellParameters.cellMaxDensity);
+		operationsMaterial.SetFloat("_MaxSpeed", Simulator.cellParameters.cellMaxSpeed);
 		Graphics.Blit(cellsTexture, cellsTexture, operationsMaterial);
 	}
 

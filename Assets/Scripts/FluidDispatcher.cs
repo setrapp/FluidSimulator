@@ -1,29 +1,22 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
-public class FluidDispatcher : MonoBehaviour {
-
+public class FluidDispatcher : MonoBehaviour
+{
 	public SimulatorMode simulatorMode = SimulatorMode.CPU;
 	FluidSimulator simulator;
 	public FluidSimulator Simulator { get { return simulator; } }
 	[SerializeField]
 	List<SimulatorOption> simulatorOptions;
-	/*[SerializeField]
-	FluidSimulator cpuSimulator;
-	[SerializeField]
-	FluidSimulator gpgpuSimulator;*/
-	public RendererMode rendererMode = RendererMode.OBJECTS;
+	public RendererMode rendererMode = RendererMode.Objects;
 	new FluidRenderer renderer;
 	public FluidRenderer Renderer { get { return renderer; } }
 	[SerializeField]
 	List<RendererOption> rendererOptions;
-	/*[SerializeField]
-	FluidRendererObjects objectsRenderer;
-	[SerializeField]
-	FluidRendererTexture textureRenderer;*/
 
 	public bool initializeOnStart = true;
-	public string FamilyName { get; private set; }
+	public string FamilyName { get; private set; }//TODO Is this redundant now?
+	public FluidInfo info;
 
 	public enum SimulatorMode
 	{
@@ -33,8 +26,8 @@ public class FluidDispatcher : MonoBehaviour {
 
 	public enum RendererMode
 	{
-		OBJECTS = 0,
-		TEXTURE
+		Objects = 0,
+		Texture
 	}
 
 	[System.Serializable]
@@ -101,7 +94,7 @@ public class FluidDispatcher : MonoBehaviour {
 	{
 		if (initializeOnStart)
 		{
-			simulator.Initialize(FamilyName, renderer);
+			simulator.Initialize(FamilyName, info, renderer);
 		}
 	}
 

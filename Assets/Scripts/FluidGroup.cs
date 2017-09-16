@@ -19,7 +19,7 @@ public class FluidGroup : MonoBehaviour
 	//[SerializeField]
 	//ShareInfoFlags shareInfoFlags = null;
 	[SerializeField]
-	FluidSimulator.FluidSimulatorInfo sharedInfo = null;
+	FluidInfo sharedInfo = null;
 	[SerializeField]
 	FluidSimulatorMouseInput mouseInput = null;
 
@@ -39,12 +39,12 @@ public class FluidGroup : MonoBehaviour
 
 		foreach(var member in members)
 		{
-			ShareInfo(member.Simulator);
+			ShareInfo(member);
 		}
 
 		foreach(var member in members)
 		{
-			member.Simulator.Initialize(member.FamilyName, member.Renderer);
+			member.Simulator.Initialize(member.FamilyName, member.info, member.Renderer);
 			member.Simulator.autoSimulate = false;
 		}
 	}
@@ -112,15 +112,15 @@ public class FluidGroup : MonoBehaviour
 	}
 
 	// TODO Is there a more programatic way of doing this (Type.GetMembers)?
-	void ShareInfo(FluidSimulator simulator)
+	void ShareInfo(FluidDispatcher dispatcher)
 	{
-		simulator.info = sharedInfo;
+		dispatcher.info = sharedInfo;
 		/*
-		if (shareInfoFlags.fluidParameters)			{ simulator.info.fluidParameters = sharedInfo.fluidParameters; }
-		if (shareInfoFlags.cellParameters)			{ simulator.info.cellParameters = sharedInfo.cellParameters; }
-		if (shareInfoFlags.operationParameters)		{ simulator.info.operationParameters = sharedInfo.operationParameters; }
-		if (shareInfoFlags.operationFlags)			{ simulator.info.operationFlags = sharedInfo.operationFlags; }
-		if (shareInfoFlags.visualizationFlags)		{ simulator.info.visualizationFlags = sharedInfo.visualizationFlags; }
+		if (shareInfoFlags.fluidParameters)			{ simulator.fluidParameters = sharedfluidParameters; }
+		if (shareInfoFlags.cellParameters)			{ simulator.cellParameters = sharedcellParameters; }
+		if (shareInfoFlags.operationParameters)		{ simulator.operationParameters = sharedoperationParameters; }
+		if (shareInfoFlags.operationFlags)			{ simulator.operationFlags = sharedoperationFlags; }
+		if (shareInfoFlags.visualizationFlags)		{ simulator.visualizationFlags = sharedvisualizationFlags; }
 		*/
 	}
 }

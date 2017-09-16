@@ -58,7 +58,7 @@ public class FluidInspector : Editor
 	void ShowCellData(string cellName, FluidSimulator simulator, FluidCellIndex cellIndex, ref bool showCell, bool showOperationData)
 	{
 		return;
-		int gridSize = simulator.info.fluidParameters.gridSize;
+		int gridSize = simulator.fluidParameters.gridSize;
 		if (cellIndex.x >= 0 && cellIndex.y >= 0 && cellIndex.z >= 0 &&
 			cellIndex.x < gridSize && cellIndex.y < gridSize && cellIndex.z < gridSize)
 		{

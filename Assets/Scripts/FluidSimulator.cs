@@ -5,60 +5,6 @@ using UnityEngine.Profiling;
 public abstract class FluidSimulator : MonoBehaviour
 {
 	#region Structure Definitions
-	[Serializable]
-	public class FluidParameters
-	{
-		public Transform container;
-		public int gridSize = 16;
-		public float physicalSize = 16;
-	}
-
-	[Serializable]
-	public class CellParameters
-	{
-		public FluidCell defaultCell;
-		public float cellMaxDensity = 1;
-		public float cellMaxSpeed = 20;
-		public float cellMass = 1;
-	}
-
-	[Serializable]
-	public class OperationParameters
-	{
-		public BoundaryCondition boundaryCondition = BoundaryCondition.EMPTY;
-		public float diffusionRate = 0.05f;
-		public int relaxationIterations = 20;
-	}
-
-	[Serializable]
-	public class VisualizationFlags
-	{
-		public bool solidVisible = true;
-		public bool outlineVisible = false;
-		public bool centerVisible = false;
-		public bool densityVisible = true;
-		public bool velocityVisible = true;
-	}
-
-	[Serializable]
-	public class OperationFlags
-	{
-		public bool applyExternals = true;
-		public bool diffuse = true;
-		public bool advect = true;
-		public bool handleDivergence = true;
-		public bool clampData = true;
-	}
-
-	[Serializable]
-	public class FluidSimulatorInfo
-	{
-		public FluidParameters fluidParameters;
-		public CellParameters cellParameters;
-		public OperationParameters operationParameters;
-		public OperationFlags operationFlags;
-		public VisualizationFlags visualizationFlags;
-	}
 
 	class FluidOperationPass
 	{
@@ -74,13 +20,7 @@ public abstract class FluidSimulator : MonoBehaviour
 		}
 	}
 
-	public enum BoundaryCondition
-	{
-		EMPTY = 0
-		//CONTAIN Implement
-		//WRAP TODO Implement
-		//LEAK TODO Implement
-	}
+	
 	#endregion
 
 	// TODO Maybe make a build fluid flag to totally rebuild with new sizes.
@@ -96,11 +36,13 @@ public abstract class FluidSimulator : MonoBehaviour
 	public bool exclusiveProfile = true;
 	public bool autoSimulate = true;
 
-	public FluidSimulatorInfo info;
+	public FluidParameters fluidParameters;
+	public CellParameters cellParameters;
+	public OperationParameters operationParameters;
+	public OperationFlags operationFlags;
 	new protected FluidRenderer renderer;
 	FluidOperationPass[] operations;
 	protected int operationPassNumber = 0;
-	public float CellSize { get; private set; }
 	delegate void FluidOperation();
 
 	public float GlobalDensity { get; protected set; }
@@ -110,7 +52,7 @@ public abstract class FluidSimulator : MonoBehaviour
 		get { return selectedCell; }
 		set
 		{
-			int maxIndex = info.fluidParameters.gridSize - 1;
+			int maxIndex = fluidParameters.gridSize - 1;
 			selectedCell.x = Mathf.Clamp(value.x, 0, maxIndex);
 			selectedCell.y = Mathf.Clamp(value.y, 0, maxIndex);
 			selectedCell.z = Mathf.Clamp(value.z, 0, maxIndex);
@@ -143,26 +85,36 @@ public abstract class FluidSimulator : MonoBehaviour
 	protected abstract void pause();
 	protected abstract void step();
 
-	public bool Initialize(string familyName, FluidRenderer renderer)
+	public bool Initialize(string familyName, FluidInfo baseInfo, FluidRenderer renderer)
 	{
 		this.familyName = familyName;
 		string result = null;
 		BeginSimulatorProfilerSample();
 		Profiler.BeginSample("Initialize");
 
-		if (this.renderer != null)
+		if (baseInfo == null)
+		{
+			result = "Attempting to initialize FluidSimulator without valid info";
+		}
+		fluidParameters = baseInfo.fluidParameters;
+		cellParameters = baseInfo.cellParameters;
+		operationParameters = baseInfo.operationParameters;
+		operationFlags = baseInfo.operationFlags;
+
+		if (string.IsNullOrEmpty(result) && this.renderer != null)
 		{
 			result = "Attempting to re-initialize a FluidSimulator";
 		}
 
 		if (string.IsNullOrEmpty(result))
 		{
-			CellSize = info.fluidParameters.physicalSize / info.fluidParameters.gridSize;
-			info.fluidParameters.container = info.fluidParameters.container ?? transform;
+			cellParameters.cellSize = fluidParameters.physicalSize / fluidParameters.gridSize;
+			fluidParameters.container = fluidParameters.container ?? transform;
+			// TODO Renderer stuff should probably just be handled by the dispatcher ... if simulator and renderer can be complete ignorant of each other, that would be best. This may not be possible as the Collider depends on both the renderer and the simulator.
 			this.renderer = renderer;
-			this.renderer.transform.parent = info.fluidParameters.container;
+			this.renderer.transform.parent = fluidParameters.container;
 			this.renderer.gameObject.name = string.Format("{0} Renderer", familyName);
-			result = this.renderer.Initialize(this);
+			result = this.renderer.Initialize(this, baseInfo);
 		}
 
 		Profiler.BeginSample("InitializeBuffers");
@@ -258,17 +210,17 @@ public abstract class FluidSimulator : MonoBehaviour
 	{
 		operations = new FluidOperationPass[]
 		{
-			!info.operationFlags.applyExternals		? null : new FluidOperationPass(ApplyExternalAdditions, 1, true),
-			!info.operationFlags.clampData			? null : new FluidOperationPass(ClampData, 1, true),
-			!info.operationFlags.diffuse			? null : new FluidOperationPass(Diffuse, info.operationParameters.relaxationIterations, true),
-			!info.operationFlags.handleDivergence	? null : new FluidOperationPass(ComputeDivergence, 1, true),
-			!info.operationFlags.handleDivergence	? null : new FluidOperationPass(RelaxDivergence, info.operationParameters.relaxationIterations, true),
-			!info.operationFlags.handleDivergence	? null : new FluidOperationPass(RemoveDivergence, 1, true),
-			!info.operationFlags.advect				? null : new FluidOperationPass(Advect, 1, true),
-			!info.operationFlags.handleDivergence	? null : new FluidOperationPass(ComputeDivergence, 1, true),
-			!info.operationFlags.handleDivergence	? null : new FluidOperationPass(RelaxDivergence, info.operationParameters.relaxationIterations, true),
-			!info.operationFlags.handleDivergence	? null : new FluidOperationPass(RemoveDivergence, 1, true),
-			!info.operationFlags.clampData			? null : new FluidOperationPass(ClampData, 1, true)
+			!operationFlags.applyExternals		? null : new FluidOperationPass(ApplyExternalAdditions, 1, true),
+			!operationFlags.clampData			? null : new FluidOperationPass(ClampData, 1, true),
+			!operationFlags.diffuse			? null : new FluidOperationPass(Diffuse, operationParameters.relaxationIterations, true),
+			!operationFlags.handleDivergence	? null : new FluidOperationPass(ComputeDivergence, 1, true),
+			!operationFlags.handleDivergence	? null : new FluidOperationPass(RelaxDivergence, operationParameters.relaxationIterations, true),
+			!operationFlags.handleDivergence	? null : new FluidOperationPass(RemoveDivergence, 1, true),
+			!operationFlags.advect				? null : new FluidOperationPass(Advect, 1, true),
+			!operationFlags.handleDivergence	? null : new FluidOperationPass(ComputeDivergence, 1, true),
+			!operationFlags.handleDivergence	? null : new FluidOperationPass(RelaxDivergence, operationParameters.relaxationIterations, true),
+			!operationFlags.handleDivergence	? null : new FluidOperationPass(RemoveDivergence, 1, true),
+			!operationFlags.clampData			? null : new FluidOperationPass(ClampData, 1, true)
 		};
 	}
 
@@ -382,9 +334,9 @@ public abstract class FluidSimulator : MonoBehaviour
 	void SetBoundaries()
 	{
 		Profiler.BeginSample("SetBoundaries");
-		switch (info.operationParameters.boundaryCondition)
+		switch (operationParameters.boundaryCondition)
 		{
-			case BoundaryCondition.EMPTY:
+			case BoundaryCondition.Empty:
 				emptyBoundaries();
 				break;
 		}

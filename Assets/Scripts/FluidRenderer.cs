@@ -5,6 +5,9 @@ using UnityEngine.Profiling;
 public abstract class FluidRenderer : MonoBehaviour
 {
 	public FluidSimulator Simulator { get; private set; }
+	public FluidParameters fluidParameters;
+	public CellParameters cellParameters;
+	public VisualizationFlags visualizationFlags;
 
 	protected abstract string generateCells();
 	FluidCell[,] temporaryCellArray;
@@ -13,17 +16,21 @@ public abstract class FluidRenderer : MonoBehaviour
 	static string noSimulator = "FluidRenderer is not attached to a FluidSimulator";
 	static string noRenderingDefinition = "FluidRenderer defines no way to render cells.";
 
-	public string Initialize(FluidSimulator simulator)
+	public string Initialize(FluidSimulator simulator, FluidInfo info)
 	{
 		string result = null;
 		if (Simulator != null)
 		{
 			result = "Attempting to re-initialize FluidRenderer";
 		}
+		this.Simulator = simulator;
+
+		fluidParameters = info.fluidParameters;
+		cellParameters = info.cellParameters;
+		visualizationFlags = info.visualizationFlags;
 
 		if (string.IsNullOrEmpty(result))
 		{
-			this.Simulator = simulator;
 			Profiler.BeginSample("FluidRenderer.GenerateCells");
 			result = generateCells();
 			Profiler.EndSample();
@@ -35,12 +42,6 @@ public abstract class FluidRenderer : MonoBehaviour
 
 	public void RenderCells(FluidCell[,] cells)
 	{
-		if (Simulator == null)
-		{
-			Debug.LogError(noSimulator, this);
-			return;
-		}
-
 		Profiler.BeginSample("FluidRenderer.RenderCells");
 		if (this is IRenderArray)
 		{
@@ -60,12 +61,6 @@ public abstract class FluidRenderer : MonoBehaviour
 
 	public void RenderCells(ComputeBuffer cells)
 	{
-		if (Simulator == null)
-		{
-			Debug.LogError(noSimulator, this);
-			return;
-		}
-
 		Profiler.BeginSample("FluidRenderer.RenderCells");
 		if (this is IRenderArray)
 		{
@@ -87,7 +82,7 @@ public abstract class FluidRenderer : MonoBehaviour
 	{
 		if (temporaryCellArray == null)
 		{
-			int gridSize = Simulator.info.fluidParameters.gridSize;
+			int gridSize = fluidParameters.gridSize;
 			temporaryCellArray = new FluidCell[gridSize, gridSize];
 		}
 		cellBuffer.GetData(temporaryCellArray);
@@ -97,7 +92,7 @@ public abstract class FluidRenderer : MonoBehaviour
 	{
 		if (temporaryCellBuffer == null)
 		{
-			int gridSize = Simulator.info.fluidParameters.gridSize;
+			int gridSize = fluidParameters.gridSize;
 			temporaryCellBuffer = new ComputeBuffer(gridSize * gridSize, Marshal.SizeOf(new FluidCell()));
 		}
 		temporaryCellBuffer.SetData(cellArray);
