@@ -27,7 +27,8 @@ public class FluidDispatcher : MonoBehaviour
 	public enum RendererMode
 	{
 		Objects = 0,
-		Texture
+		Pixels,
+		Geometry
 	}
 
 	[System.Serializable]

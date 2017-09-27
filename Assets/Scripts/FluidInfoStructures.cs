@@ -15,6 +15,7 @@ public class FluidInfo
 public class FluidParameters
 {
 	public Transform container;
+	[Range(0, 128)]
 	public int gridSize = 16;
 	public float physicalSize = 16;
 }

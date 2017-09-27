@@ -9,13 +9,14 @@
 	}
 	SubShader
 	{
-		Tags { "RenderType"="Opaque" }
+		Tags { "RenderType"="Transparent" }
+		//Tags { "Queue"="Transparent" "RenderType"="Transparent" }
+		//Blend SrcAlpha OneMinusSrcAlpha
 		LOD 100
 
 		Pass
 		{
 			CGPROGRAM
-
 			#define Z_STEP 1
 			#define Y_STEP (Z_STEP * _TextureSize.z)
 			#define X_STEP (Y_STEP * _TextureSize.y)
@@ -52,7 +53,6 @@
 			float4 _MainTex_ST;
 			float4 _TextureSize;
 			StructuredBuffer<FluidCell> _FluidCells;
-			RWStructuredBuffer<float> _Test;
 			float _MaxDensity;
 			float _MaxSpeed;
 			
@@ -76,7 +76,6 @@
 				float density = cell.density / _MaxDensity;
 				float epsilon = 0.001;
 
-				// Render Velocity as speed squared to avoid sqrt, we don't really care about the precision here.
 				// TODO Profile the sqrt cost
 				float speed = sqrt((cell.velocity.x * cell.velocity.x) + (cell.velocity.y * cell.velocity.y));
 				float normalizedSpeed = speed + epsilon;
@@ -86,7 +85,6 @@
 				// Clip speed to zero when small enough.
 				normalizedSpeed = normalizedSpeed - (normalizedSpeed * (speed < epsilon));
 				float3 velocityColor = abs(direction * normalizedSpeed);
-
 				float4 color = float4(velocityColor, density);
 				return color;
 			}

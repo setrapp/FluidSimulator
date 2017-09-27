@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 [RequireComponent(typeof(MeshRenderer)), RequireComponent(typeof(FluidColliderBox))]
-public class FluidRendererTexture : FluidRenderer, IRenderBuffer
+public class FluidRendererPixels : FluidRenderer, IRenderBuffer
 {
 	[SerializeField]
 	Material operationsMaterial;	// TODO Rename this.
@@ -48,6 +48,7 @@ public class FluidRendererTexture : FluidRenderer, IRenderBuffer
 		operationsMaterial.SetBuffer("_FluidCells", fluidCells);
 		operationsMaterial.SetFloat("_MaxDensity", Simulator.cellParameters.cellMaxDensity);
 		operationsMaterial.SetFloat("_MaxSpeed", Simulator.cellParameters.cellMaxSpeed);
+		// TODO Is the blit necessary here? Will it just render properly when Unity renders?
 		Graphics.Blit(cellsTexture, cellsTexture, operationsMaterial);
 	}
 
