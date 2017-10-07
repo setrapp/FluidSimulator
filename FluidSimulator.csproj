@@ -13,13 +13,11 @@
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Unity Subset v3.5</TargetFrameworkProfile>
-    <CompilerResponseFile>
-    </CompilerResponseFile>
+    <CompilerResponseFile></CompilerResponseFile>
     <UnityProjectType>Game:1</UnityProjectType>
     <UnityBuildTarget>StandaloneWindows64:19</UnityBuildTarget>
     <UnityVersion>2017.1.0p4</UnityVersion>
-    <RootNamespace>
-    </RootNamespace>
+    <RootNamespace></RootNamespace>
     <LangVersion>4</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -89,6 +87,7 @@
     <Compile Include="Assets\Scripts\FluidDispatcher.cs" />
     <Compile Include="Assets\Scripts\FluidGroup.cs" />
     <Compile Include="Assets\Scripts\FluidInfoStructures.cs" />
+    <Compile Include="Assets\Scripts\FluidMesh.cs" />
     <Compile Include="Assets\Scripts\FluidRenderer.cs" />
     <Compile Include="Assets\Scripts\FluidRendererGeometry.cs" />
     <Compile Include="Assets\Scripts\FluidRendererObjects.cs" />
@@ -103,7 +102,8 @@
   <ItemGroup>
     <None Include="Assets\Shaders\Compute\FluidCompute.compute" />
     <None Include="Assets\Shaders\Compute\FluidOperations.compute" />
-    <None Include="Assets\Shaders\FluidGeometry.shader" />
+    <None Include="Assets\Shaders\FluidGeometryBase.shader" />
+    <None Include="Assets\Shaders\FluidGeometryVelocity.shader" />
     <None Include="Assets\Shaders\FluidTexture.shader" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -137,7 +137,8 @@
   <ItemGroup>
     <None Include="Assets\Shaders\Compute\FluidCompute.compute" />
     <None Include="Assets\Shaders\Compute\FluidOperations.compute" />
-    <None Include="Assets\Shaders\FluidGeometry.shader" />
+    <None Include="Assets\Shaders\FluidGeometryBase.shader" />
+    <None Include="Assets\Shaders\FluidGeometryVelocity.shader" />
     <None Include="Assets\Shaders\FluidTexture.shader" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

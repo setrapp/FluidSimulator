@@ -4,7 +4,15 @@ using UnityEngine;
 [RequireComponent(typeof(MeshRenderer)), RequireComponent(typeof(FluidColliderBox))]
 public class FluidRendererGeometry : FluidRenderer, IRenderBuffer
 {
-	MeshRenderer meshRenderer;
+	[SerializeField]
+	FluidMesh fluidBase;
+	[SerializeField]
+	FluidMesh fluidVelocity;
+
+	[SerializeField]
+	Material baseMaterial;
+	[SerializeField]
+	Material velocityMaterial;
 
 	protected override string generateCells()
 	{
@@ -16,33 +24,8 @@ public class FluidRendererGeometry : FluidRenderer, IRenderBuffer
 
 		if (string.IsNullOrEmpty(result))
 		{
-			float cellSize = 1f / gridSize;
-			float center = (gridSize - 1) / 2f;
-			List<Vector3> vertices = new List<Vector3>();
-			List<Vector2> uvs = new List<Vector2>();
-			int[] indices = new int[gridSize * gridSize];
-
-			for (int i = 0; i < gridSize; i++)
-			{
-				float u = (float)i / gridSize;
-				for (int j = 0; j < gridSize; j++)
-				{
-					float v = (float)j / gridSize;
-					int index = (i * gridSize) + j;
-					vertices.Add(new Vector3((i - center) * cellSize, (j - center) * cellSize, 0));
-					uvs.Add(new Vector2(u, v));
-					indices[index] = index;
-				}
-			}
-			Mesh mesh = new Mesh();
-			mesh.SetVertices(vertices);
-			mesh.SetUVs(0, uvs);
-			mesh.SetIndices(indices, MeshTopology.Points, 0);
-			GetComponent<MeshFilter>().mesh = mesh;
-
-			meshRenderer = GetComponent<MeshRenderer>();
-			meshRenderer.material.SetVector("_GridSize", new Vector4(gridSize, gridSize, 1, 0));
-			meshRenderer.material.SetFloat("_CellSize", 0.5f / gridSize);
+			fluidBase.InitializeMesh(gridSize, baseMaterial);
+			fluidVelocity.InitializeMesh(gridSize, velocityMaterial);
 
 			transform.localScale = new Vector3(physicalSize, physicalSize, physicalSize);
 			GetComponent<FluidColliderBox>().Initialize(Simulator);
@@ -53,9 +36,29 @@ public class FluidRendererGeometry : FluidRenderer, IRenderBuffer
 
 	void IRenderBuffer.RenderCells(ComputeBuffer fluidCells)
 	{
-		meshRenderer.material.SetBuffer("_FluidCells", fluidCells);
-		meshRenderer.material.SetFloat("_MaxDensity", Simulator.cellParameters.cellMaxDensity);
-		meshRenderer.material.SetFloat("_MaxSpeed", Simulator.cellParameters.cellMaxSpeed);
-		meshRenderer.material.SetFloat("_CellSize", 0.5f / fluidParameters.gridSize);
+		FluidMeshParameters renderParameters = new FluidMeshParameters()
+		{
+			cellMaxDensity = cellParameters.cellMaxDensity,
+			cellMaxSpeed = cellParameters.cellMaxSpeed,
+			gridSize = fluidParameters.gridSize
+		};
+
+		if (fluidBase.gameObject.activeSelf != visualizationFlags.densityVisible)
+		{
+			fluidBase.gameObject.SetActive(visualizationFlags.densityVisible);
+		}
+		if (fluidVelocity.gameObject.activeSelf != visualizationFlags.velocityVisible)
+		{
+			fluidVelocity.gameObject.SetActive(visualizationFlags.velocityVisible);
+		}
+
+		if (fluidBase.gameObject.activeSelf)
+		{
+			fluidBase.PreRenderMesh(fluidCells, renderParameters);
+		}
+		if (fluidVelocity.gameObject.activeSelf)
+		{
+			fluidVelocity.PreRenderMesh(fluidCells, renderParameters);
+		}
 	}
 }

@@ -162,14 +162,20 @@ Prefab:
       propertyPath: m_Name
       value: Lonely Fluid Dispatcher
       objectReference: {fileID: 0}
-    - target: {fileID: 1313270380478682, guid: 528202cec4974904eb4df89408fa4cfa, type: 2}
-      propertyPath: m_IsActive
-      value: 0
+    - target: {fileID: 114105785418012140, guid: 528202cec4974904eb4df89408fa4cfa,
+        type: 2}
+      propertyPath: info.fluidParameters.physicalSize
+      value: 32
       objectReference: {fileID: 0}
     - target: {fileID: 114105785418012140, guid: 528202cec4974904eb4df89408fa4cfa,
         type: 2}
       propertyPath: info.fluidParameters.gridSize
-      value: 128
+      value: 64
+      objectReference: {fileID: 0}
+    - target: {fileID: 114105785418012140, guid: 528202cec4974904eb4df89408fa4cfa,
+        type: 2}
+      propertyPath: info.operationParameters.diffusionRate
+      value: 0.001
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 528202cec4974904eb4df89408fa4cfa, type: 2}
@@ -253,7 +259,7 @@ Prefab:
     - target: {fileID: 114105785418012140, guid: 528202cec4974904eb4df89408fa4cfa,
         type: 2}
       propertyPath: rendererMode
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 528202cec4974904eb4df89408fa4cfa, type: 2}
@@ -319,8 +325,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b6f321c41b2b4d649bb49720eb81f503, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  physicalSize: 16
-  gridSize: 16
 --- !u!33 &1052351388
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -680,7 +684,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1998456502
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -698,7 +702,7 @@ MonoBehaviour:
   sharedInfo:
     fluidParameters:
       container: {fileID: 1026398945}
-      gridSize: 128
+      gridSize: 32
       physicalSize: 16
     cellParameters:
       defaultCell:
@@ -723,8 +727,8 @@ MonoBehaviour:
     visualizationFlags:
       solidVisible: 1
       outlineVisible: 0
-      centerVisible: 1
-      densityVisible: 1
+      centerVisible: 0
+      densityVisible: 0
       velocityVisible: 1
   mouseInput: {fileID: 1823739105}
 --- !u!4 &1998456503

@@ -1,4 +1,4 @@
-﻿Shader "Fluid/Geometry"
+﻿Shader "Fluid/GeometryBase"
 {
 	Properties
 	{
@@ -12,6 +12,7 @@
 		Tags { "Queue"="Transparent" "RenderType"="Transparent" }
 		Blend SrcAlpha OneMinusSrcAlpha
 		LOD 100
+		Cull Off //TODO only need this for velocity mesh
 
 		Pass
 		{
@@ -124,8 +125,14 @@
 			
 			fixed4 frag (v2f i) : SV_Target
 			{
-				float3 velocityColor = i.directionAndSpeed.rgb * i.directionAndSpeed.a;
-				float4 col = float4(velocityColor, i.density);
+				//float3 velocityColor = i.directionAndSpeed.rgb * i.directionAndSpeed.a;
+				float4 col = float4(1, 1, 1, i.density);
+				//float uvDotDirection = float((i.uv.x * i.directionAndSpeed.x) + (i.uv.y * i.directionAndSpeed.y));
+				//col.rbg = lerp(float3(0, 0, 0), float3(1, 1, 1), uvDotDirection);
+
+				// TODO Temporary render cell as white with black velocity line
+				//col = lerp(float4(1, 1, 1, 0), float4(0, 0, 0, 1), saturate(-i.density));
+
 				return col;
 			}
 			ENDCG
