@@ -5,62 +5,30 @@ public class FluidSimulatorCPU : FluidSimulator {
 	[Header("Cell Rendering")]
 	[SerializeField]
 	public FluidCellRenderer cellPrefab;
-	FluidCellRenderer[,] cells;
 	FluidCell[,] cellBuffer1;
 	FluidCell[,] cellBuffer2;
 	FluidCell[,] inCells;
 	FluidCell[,] outCells;
 	private FluidCell[,] externalAdditions;
-	private Vector3[,] reverseVelocities;
 	public FluidCellOperationData[,] operationData;
-
-	protected override string generatePoolCells()
-	{
-		string result = null;
-
-		if (cellPrefab != null)
-		{
-			float halfPoolSize = info.fluidParameters.gridSize / 2;
-			cells = new FluidCellRenderer[info.fluidParameters.gridSize, info.fluidParameters.gridSize];
-			externalAdditions = new FluidCell[info.fluidParameters.gridSize, info.fluidParameters.gridSize];
-			reverseVelocities = new Vector3[info.fluidParameters.gridSize, info.fluidParameters.gridSize];
-			operationData = new FluidCellOperationData[info.fluidParameters.gridSize, info.fluidParameters.gridSize];
-			for (int i = 0; i < info.fluidParameters.gridSize; i++)
-			{
-				for (int j = 0; j < info.fluidParameters.gridSize; j++)
-				{
-					Vector3 pos = transform.position + new Vector3(CellSize * (i - halfPoolSize), CellSize * (j - halfPoolSize), 0);
-					FluidCellRenderer newCell = (((GameObject)Instantiate(cellPrefab.gameObject, pos, Quaternion.identity, pool.transform)).GetComponent<FluidCellRenderer>());
-					newCell.Initialize(this, info.cellParameters.defaultCell, i, j);
-					newCell.transform.localScale = new Vector3(CellSize, CellSize, CellSize);
-					cells[i, j] = newCell;
-
-					externalAdditions[i, j] = new FluidCell();
-					reverseVelocities[i, j] = Vector3.zero;
-					operationData[i, j] = new FluidCellOperationData();
-				}
-			}
-		}
-		else
-		{
-			result = string.Format("No Cell Prefab provided to {0}'s pool.", gameObject.name);
-		}
-
-		return result;
-	}
 
 	protected override string initializeBuffers()
 	{
 		string result = null;
 
-		cellBuffer1 = new FluidCell[info.fluidParameters.gridSize, info.fluidParameters.gridSize];
-		cellBuffer2 = new FluidCell[info.fluidParameters.gridSize, info.fluidParameters.gridSize];
-		for (int i = 0; i < info.fluidParameters.gridSize; i++)
+		cellBuffer1 = new FluidCell[fluidParameters.gridSize, fluidParameters.gridSize];
+		cellBuffer2 = new FluidCell[fluidParameters.gridSize, fluidParameters.gridSize];
+		externalAdditions = new FluidCell[fluidParameters.gridSize, fluidParameters.gridSize];
+		operationData = new FluidCellOperationData[fluidParameters.gridSize, fluidParameters.gridSize];
+
+		for (int i = 0; i < fluidParameters.gridSize; i++)
 		{
-			for (int j = 0; j < info.fluidParameters.gridSize; j++)
+			for (int j = 0; j < fluidParameters.gridSize; j++)
 			{
 				cellBuffer1[i, j] = new FluidCell();
 				cellBuffer2[i, j] = new FluidCell();
+				externalAdditions[i, j] = new FluidCell();
+				operationData[i, j] = new FluidCellOperationData();
 			}
 		}
 
@@ -73,9 +41,9 @@ public class FluidSimulatorCPU : FluidSimulator {
 	protected override void prepareNextFrame()
 	{
 		// Clear out external additions.
-		for (int i = 0; i < info.fluidParameters.gridSize; i++)
+		for (int i = 0; i < fluidParameters.gridSize; i++)
 		{
-			for (int j = 0; j < info.fluidParameters.gridSize; j++)
+			for (int j = 0; j < fluidParameters.gridSize; j++)
 			{
 				externalAdditions[i, j].density = 0;
 				externalAdditions[i, j].velocity = Vector3.zero;
@@ -90,16 +58,16 @@ public class FluidSimulatorCPU : FluidSimulator {
 			return;
 		}
 
-		int densityCellRadius = (int)Mathf.Max(densityChangeRadius / CellSize, 0);
-		int forceCellRadius = (int)Mathf.Max(forceRadius / CellSize, 0);
+		int densityCellRadius = (int)Mathf.Max(densityChangeRadius / cellParameters.cellSize, 0);
+		int forceCellRadius = (int)Mathf.Max(forceRadius / cellParameters.cellSize, 0);
 		int applyCellRadius = Mathf.Max(densityCellRadius, forceCellRadius);
 
 		float densityFalloff = densityChange / (densityCellRadius + 1);
 		Vector3 forceFalloff = force / (forceCellRadius + 1);
 
-		for (int i = (int)Mathf.Max(index.x- applyCellRadius, 0); i < Mathf.Min(index.x + applyCellRadius, info.fluidParameters.gridSize - 1); i++)
+		for (int i = (int)Mathf.Max(index.x- applyCellRadius, 0); i < Mathf.Min(index.x + applyCellRadius, fluidParameters.gridSize - 1); i++)
 		{
-			for (int j = (int)Mathf.Max(index.y - applyCellRadius, 0); j < Mathf.Min(index.y + applyCellRadius, info.fluidParameters.gridSize - 1); j++)
+			for (int j = (int)Mathf.Max(index.y - applyCellRadius, 0); j < Mathf.Min(index.y + applyCellRadius, fluidParameters.gridSize - 1); j++)
 			{
 				int distance = Mathf.Max(Mathf.Abs(i - index.x), Mathf.Abs(j - index.y));
 				if (distance <= densityCellRadius)
@@ -127,7 +95,7 @@ public class FluidSimulatorCPU : FluidSimulator {
 
 	protected override FluidCell getCell(FluidCellIndex index)
 	{
-		return cells[index.x, index.y].cell;
+		return inCells[index.x, index.y];
 	}
 
 	protected override FluidCellOperationData getCellOperationData(FluidCellIndex index)
@@ -137,12 +105,12 @@ public class FluidSimulatorCPU : FluidSimulator {
 
 	protected override void applyExternalAdditions()
 	{
-		for (int i = 0; i < info.fluidParameters.gridSize; i++)
+		for (int i = 0; i < fluidParameters.gridSize; i++)
 		{
-			for (int j = 0; j < info.fluidParameters.gridSize; j++)
+			for (int j = 0; j < fluidParameters.gridSize; j++)
 			{
 				outCells[i, j].density = inCells[i, j].density + externalAdditions[i, j].density * Time.deltaTime;
-				outCells[i, j].velocity = inCells[i, j].velocity + (externalAdditions[i, j].velocity / info.cellParameters.cellMass) * Time.deltaTime;
+				outCells[i, j].velocity = inCells[i, j].velocity + (externalAdditions[i, j].velocity / cellParameters.cellMass) * Time.deltaTime;
 			}
 		}
 	}
@@ -150,17 +118,16 @@ public class FluidSimulatorCPU : FluidSimulator {
 	protected override void diffuse()
 	{
 		// TODO There is probably a better way to do this than on ever iteration.
-		float dtDiffusion = (info.operationParameters.diffusionRate * Time.deltaTime * info.fluidParameters.gridSize * info.fluidParameters.gridSize) / info.operationParameters.relaxationIterations;
-		//Debug.Log("CPU " + dtDiffusion);
+		float dtDiffusion = (operationParameters.diffusionRate * Time.deltaTime * fluidParameters.gridSize * fluidParameters.gridSize) / operationParameters.relaxationIterations;
 
-		for (int i = 0; i < info.fluidParameters.gridSize; i++)
+		for (int i = 0; i < fluidParameters.gridSize; i++)
 		{
-			for (int j = 0; j < info.fluidParameters.gridSize; j++)
+			for (int j = 0; j < fluidParameters.gridSize; j++)
 			{
 				int left = Mathf.Max(i - 1, 0);
-				int right = Mathf.Min(i + 1, info.fluidParameters.gridSize - 1);
+				int right = Mathf.Min(i + 1, fluidParameters.gridSize - 1);
 				int down = Mathf.Max(j - 1, 0);
-				int up = Mathf.Min(j + 1, info.fluidParameters.gridSize - 1);
+				int up = Mathf.Min(j + 1, fluidParameters.gridSize - 1);
 
 				outCells[i, j].density = (inCells[i, j].density +
 					dtDiffusion * (inCells[left, j].density + inCells[right, j].density +
@@ -184,16 +151,16 @@ public class FluidSimulatorCPU : FluidSimulator {
 		float leftPortion, rightPortion, downPortion, upPortion;
 		Vector2 oldGridPosition;
 
-		float reciprocalCellSize = 1.0f / CellSize;
+		float reciprocalCellSize = 1.0f / cellParameters.cellSize;
 
-		for (int i = 0; i < info.fluidParameters.gridSize; i++)
+		for (int i = 0; i < fluidParameters.gridSize; i++)
 		{
-			for (int j = 0; j < info.fluidParameters.gridSize; j++)
+			for (int j = 0; j < fluidParameters.gridSize; j++)
 			{
 				Vector2 idVelocity = ((Vector2)inCells[i, j].velocity * reciprocalCellSize);
 				oldGridPosition = new Vector2(i, j) - idVelocity;
-				oldGridPosition.x = Mathf.Clamp(oldGridPosition.x, 1.5f, info.fluidParameters.gridSize - 1.5f);
-				oldGridPosition.y = Mathf.Clamp(oldGridPosition.y, 1.5f, info.fluidParameters.gridSize - 1.5f);
+				oldGridPosition.x = Mathf.Clamp(oldGridPosition.x, 1.5f, fluidParameters.gridSize - 1.5f);
+				oldGridPosition.y = Mathf.Clamp(oldGridPosition.y, 1.5f, fluidParameters.gridSize - 1.5f);
 
 				leftIndex = (int)oldGridPosition.x;
 				rightIndex = leftIndex + 1;
@@ -222,18 +189,18 @@ public class FluidSimulatorCPU : FluidSimulator {
 
 	protected override void computeDivergence()
 	{
-		float reciprocalPoolSize = 1.0f / info.fluidParameters.gridSize;
+		float reciprocalGridSize = 1.0f / fluidParameters.gridSize;
 
-		for (int i = 0; i < info.fluidParameters.gridSize; i++)
+		for (int i = 0; i < fluidParameters.gridSize; i++)
 		{
-			for (int j = 0; j < info.fluidParameters.gridSize; j++)
+			for (int j = 0; j < fluidParameters.gridSize; j++)
 			{
 				int left = Mathf.Max(i - 1, 0);
-				int right = Mathf.Min(i + 1, info.fluidParameters.gridSize - 1);
+				int right = Mathf.Min(i + 1, fluidParameters.gridSize - 1);
 				int down = Mathf.Max(j - 1, 0);
-				int up = Mathf.Min(j + 1, info.fluidParameters.gridSize - 1);
+				int up = Mathf.Min(j + 1, fluidParameters.gridSize - 1);
 
-				outCells[i, j].rawDivergence = -0.5f * reciprocalPoolSize *
+				outCells[i, j].rawDivergence = -0.5f * reciprocalGridSize *
 					((inCells[right, j].velocity.x - inCells[left, j].velocity.x) +
 					(inCells[i, up].velocity.y - inCells[i, down].velocity.y));
 				outCells[i, j].relaxedDivergence = 0;
@@ -245,14 +212,14 @@ public class FluidSimulatorCPU : FluidSimulator {
 
 	protected override void relaxDivergence()
 	{
-		for (int i = 0; i < info.fluidParameters.gridSize; i++)
+		for (int i = 0; i < fluidParameters.gridSize; i++)
 		{
-			for (int j = 0; j < info.fluidParameters.gridSize; j++)
+			for (int j = 0; j < fluidParameters.gridSize; j++)
 			{
 				int left = Mathf.Max(i - 1, 0);
-				int right = Mathf.Min(i + 1, info.fluidParameters.gridSize - 1);
+				int right = Mathf.Min(i + 1, fluidParameters.gridSize - 1);
 				int down = Mathf.Max(j - 1, 0);
-				int up = Mathf.Min(j + 1, info.fluidParameters.gridSize - 1);
+				int up = Mathf.Min(j + 1, fluidParameters.gridSize - 1);
 
 				outCells[i, j].relaxedDivergence = (inCells[i, j].rawDivergence +
 					inCells[left, j].relaxedDivergence + inCells[right, j].relaxedDivergence +
@@ -264,16 +231,16 @@ public class FluidSimulatorCPU : FluidSimulator {
 
 	protected override void removeDivergence()
 	{
-		for (int i = 0; i < info.fluidParameters.gridSize; i++)
+		for (int i = 0; i < fluidParameters.gridSize; i++)
 		{
-			for (int j = 0; j < info.fluidParameters.gridSize; j++)
+			for (int j = 0; j < fluidParameters.gridSize; j++)
 			{
 				int left = Mathf.Max(i - 1, 0);
-				int right = Mathf.Min(i + 1, info.fluidParameters.gridSize - 1);
+				int right = Mathf.Min(i + 1, fluidParameters.gridSize - 1);
 				int down = Mathf.Max(j - 1, 0);
-				int up = Mathf.Min(j + 1, info.fluidParameters.gridSize - 1);
+				int up = Mathf.Min(j + 1, fluidParameters.gridSize - 1);
 
-				outCells[i, j].velocity = inCells[i, j].velocity - (0.5f * info.fluidParameters.gridSize *
+				outCells[i, j].velocity = inCells[i, j].velocity - (0.5f * fluidParameters.gridSize *
 					new Vector3(inCells[right, j].relaxedDivergence - inCells[left, j].relaxedDivergence,
 					inCells[i, up].relaxedDivergence - inCells[i, down].relaxedDivergence, 0));
 				outCells[i, j].density = inCells[i, j].density;
@@ -283,19 +250,19 @@ public class FluidSimulatorCPU : FluidSimulator {
 
 	protected override void clampData()
 	{
-		float maxSqrSpeed = info.cellParameters.cellMaxSpeed * info.cellParameters.cellMaxSpeed;
+		float maxSqrSpeed = cellParameters.cellMaxSpeed * cellParameters.cellMaxSpeed;
 
-		for (int i = 0; i < info.fluidParameters.gridSize; i++)
+		for (int i = 0; i < fluidParameters.gridSize; i++)
 		{
-			for (int j = 0; j < info.fluidParameters.gridSize; j++)
+			for (int j = 0; j < fluidParameters.gridSize; j++)
 			{
-				outCells[i, j].density = Mathf.Clamp(inCells[i, j].density, 0, info.cellParameters.cellMaxDensity);
+				outCells[i, j].density = Mathf.Clamp(inCells[i, j].density, 0, cellParameters.cellMaxDensity);
 
 				float sqrSpeed = outCells[i, j].velocity.sqrMagnitude;
 				outCells[i, j].velocity = inCells[i, j].velocity;
 				if (sqrSpeed > maxSqrSpeed)
 				{
-					outCells[i, j].velocity = (outCells[i, j].velocity / (Mathf.Sqrt(sqrSpeed))) * info.cellParameters.cellMaxSpeed;
+					outCells[i, j].velocity = (outCells[i, j].velocity / (Mathf.Sqrt(sqrSpeed))) * cellParameters.cellMaxSpeed;
 				}
 			}
 		}
@@ -306,10 +273,10 @@ public class FluidSimulatorCPU : FluidSimulator {
 		int sampleCorner;
 		float cornerSample;
 		Vector3 sample;
-		int maxIndex = info.fluidParameters.gridSize - 1;
-		for (int i = 0; i < info.fluidParameters.gridSize; i++)
+		int maxIndex = fluidParameters.gridSize - 1;
+		for (int i = 0; i < fluidParameters.gridSize; i++)
 		{
-			sampleCorner = (i == 0) ? 1 : (i == info.fluidParameters.gridSize - 1) ? -1 : 0;
+			sampleCorner = (i == 0) ? 1 : (i == fluidParameters.gridSize - 1) ? -1 : 0;
 
 			// Bottom
 			sample = outCells[i + sampleCorner, 1].velocity;
@@ -318,7 +285,7 @@ public class FluidSimulatorCPU : FluidSimulator {
 			outCells[i, 0].density = 0;
 
 			// Top
-			sample = outCells[i + sampleCorner, info.fluidParameters.gridSize - 2].velocity;
+			sample = outCells[i + sampleCorner, fluidParameters.gridSize - 2].velocity;
 			cornerSample = (sampleCorner == 0) ? sample.x : Mathf.Abs(sample.x) * sampleCorner;
 			outCells[i, maxIndex].velocity = Vector3.zero;// new Vector3(cornerSample, -Mathf.Abs(sample.y), sample.z);
 			outCells[i, maxIndex].density = 0;
@@ -332,7 +299,7 @@ public class FluidSimulatorCPU : FluidSimulator {
 
 
 			// Right
-			sample = outCells[info.fluidParameters.gridSize - 2, i + sampleCorner].velocity;
+			sample = outCells[fluidParameters.gridSize - 2, i + sampleCorner].velocity;
 			cornerSample = (sampleCorner == 0) ? sample.y : Mathf.Abs(sample.y) * sampleCorner;
 			outCells[maxIndex, i].velocity = Vector3.zero;// new Vector3(-Mathf.Abs(sample.x), cornerSample, sample.z);
 			outCells[maxIndex, i].density = 0;
@@ -340,34 +307,21 @@ public class FluidSimulatorCPU : FluidSimulator {
 		}
 	}
 
-	protected override void applyCells()
+	protected override void sendCellsToRenderer()
 	{
-		UnityEngine.Profiling.Profiler.BeginSample("ApplyCells");
-		for (int i = 0; i < info.fluidParameters.gridSize; i++)
-		{
-			for (int j = 0; j < info.fluidParameters.gridSize; j++)
-			{
-				//cells[i, j].cell = outCells[i, j];
-				cells[i, j].cell.density = inCells[i, j].density;
-				cells[i, j].cell.velocity = inCells[i, j].velocity;
-				cells[i, j].cell.rawDivergence = inCells[i, j].rawDivergence;
-				cells[i, j].cell.relaxedDivergence = inCells[i, j].relaxedDivergence;
-
-			}
-		}
-		UnityEngine.Profiling.Profiler.EndSample();
+		renderer.RenderCells(inCells);
 	}
 
 	protected override void reset()
 	{
-		for (int i = 0; i < info.fluidParameters.gridSize; i++)
+		for (int i = 0; i < fluidParameters.gridSize; i++)
 		{
-			for (int j = 0; j < info.fluidParameters.gridSize; j++)
+			for (int j = 0; j < fluidParameters.gridSize; j++)
 			{
-				inCells[i, j].density = outCells[i, j].density = cells[i, j].cell.density = info.cellParameters.defaultCell.density;
-				inCells[i, j].velocity = outCells[i, j].velocity = cells[i, j].cell.velocity = info.cellParameters.defaultCell.velocity;
-				inCells[i, j].rawDivergence = outCells[i, j].rawDivergence = cells[i, j].cell.rawDivergence = info.cellParameters.defaultCell.rawDivergence;
-				inCells[i, j].relaxedDivergence = outCells[i, j].relaxedDivergence = cells[i, j].cell.relaxedDivergence = info.cellParameters.defaultCell.relaxedDivergence;
+				inCells[i, j].density = outCells[i, j].density = cellParameters.defaultCell.density;
+				inCells[i, j].velocity = outCells[i, j].velocity = cellParameters.defaultCell.velocity;
+				inCells[i, j].rawDivergence = outCells[i, j].rawDivergence = cellParameters.defaultCell.rawDivergence;
+				inCells[i, j].relaxedDivergence = outCells[i, j].relaxedDivergence = cellParameters.defaultCell.relaxedDivergence;
 			}
 		}
 	}

@@ -83,19 +83,30 @@
     <Compile Include="Assets\Scripts\FluidCell.cs" />
     <Compile Include="Assets\Scripts\FluidCellOperationData.cs" />
     <Compile Include="Assets\Scripts\FluidCellRenderer.cs" />
-    <Compile Include="Assets\Scripts\FluidDebug.cs" />
+    <Compile Include="Assets\Scripts\FluidCollider.cs" />
+    <Compile Include="Assets\Scripts\FluidColliderBox.cs" />
+    <Compile Include="Assets\Scripts\FluidColliderCell.cs" />
     <Compile Include="Assets\Scripts\FluidDispatcher.cs" />
     <Compile Include="Assets\Scripts\FluidGroup.cs" />
-    <Compile Include="Assets\Scripts\FluidPool.cs" />
+    <Compile Include="Assets\Scripts\FluidInfoStructures.cs" />
+    <Compile Include="Assets\Scripts\FluidMesh.cs" />
+    <Compile Include="Assets\Scripts\FluidRenderer.cs" />
+    <Compile Include="Assets\Scripts\FluidRendererGeometry.cs" />
+    <Compile Include="Assets\Scripts\FluidRendererObjects.cs" />
+    <Compile Include="Assets\Scripts\FluidRendererPixels.cs" />
     <Compile Include="Assets\Scripts\FluidSimulator.cs" />
     <Compile Include="Assets\Scripts\FluidSimulatorCPU.cs" />
     <Compile Include="Assets\Scripts\FluidSimulatorGPGPU.cs" />
     <Compile Include="Assets\Scripts\FluidSimulatorMouseInput.cs" />
+    <Compile Include="Assets\Scripts\IRenderArray.cs" />
+    <Compile Include="Assets\Scripts\IRenderBuffer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\Compute\FluidCompute.compute" />
     <None Include="Assets\Shaders\Compute\FluidOperations.compute" />
-    <None Include="Assets\Shaders\Compute\Test.compute" />
+    <None Include="Assets\Shaders\FluidGeometryDensity.shader" />
+    <None Include="Assets\Shaders\FluidGeometryVelocity.shader" />
+    <None Include="Assets\Shaders\FluidTexture.shader" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

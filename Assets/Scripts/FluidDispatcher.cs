@@ -1,22 +1,48 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
-public class FluidDispatcher : MonoBehaviour {
-
-	public FluidMode mode = FluidMode.CPU;
-	private FluidSimulator simulator;
+public class FluidDispatcher : MonoBehaviour
+{
+	public SimulatorMode simulatorMode = SimulatorMode.CPU;
+	FluidSimulator simulator;
 	public FluidSimulator Simulator { get { return simulator; } }
 	[SerializeField]
-	private FluidSimulator cpuSimulator;
+	List<SimulatorOption> simulatorOptions;
+	public RendererMode rendererMode = RendererMode.Objects;
+	new FluidRenderer renderer;
+	public FluidRenderer Renderer { get { return renderer; } }
 	[SerializeField]
-	private FluidSimulator gpgpuSimulator;
-	public bool initializeOnStart = true;
-	public string FamilyName { get; private set; }
+	List<RendererOption> rendererOptions;
 
-	public enum FluidMode
+	public bool initializeOnStart = true;
+	public string FamilyName { get; private set; }//TODO Is this redundant now?
+	public FluidInfo info;
+
+	public enum SimulatorMode
 	{
 		CPU = 0,
 		GPGPU
+	}
+
+	public enum RendererMode
+	{
+		Objects = 0,
+		Pixels,
+		Geometry
+	}
+
+	[System.Serializable]
+	private class SimulatorOption
+	{
+		public SimulatorMode mode;
+		public FluidSimulator simulator;
+	}
+
+	[System.Serializable]
+	private class RendererOption
+	{
+		public RendererMode mode;
+		public FluidRenderer renderer;
 	}
 
 	void Awake()
@@ -24,21 +50,44 @@ public class FluidDispatcher : MonoBehaviour {
 		FamilyName = name.Substring(0, name.IndexOf("Dispatcher")).TrimEnd();
 		gameObject.name = string.Format("{0} Dispatcher", FamilyName);
 
-		string nullReference = "Attempting to use {0} fluid pool that does not exist.";
-		switch (mode)
+		string nullReference = "Attempting to use {0} {1} that does not exist.";
+
+		for (int i = 0; i < simulatorOptions.Count; i++)
 		{
-			case FluidMode.CPU:
-				simulator = cpuSimulator;
-				if (cpuSimulator != null) { cpuSimulator.gameObject.SetActive(true); }
-				else { throw new System.NullReferenceException(string.Format(nullReference, "CPU")); }
-				if (gpgpuSimulator != null) { Destroy(gpgpuSimulator.gameObject); }
-				break;
-			case FluidMode.GPGPU:
-				simulator = gpgpuSimulator;
-				if (gpgpuSimulator != null) { gpgpuSimulator.gameObject.SetActive(true); }
-				else { throw new System.NullReferenceException(string.Format(nullReference, "GPGPU")); }
-				if (cpuSimulator != null) { Destroy(cpuSimulator.gameObject); }
-				break;
+			if (simulator == null && simulatorOptions[i].mode == simulatorMode)
+			{
+				simulator = simulatorOptions[i].simulator;
+				simulator.gameObject.SetActive(true);
+			}
+			else
+			{
+				Destroy(simulatorOptions[i].simulator.gameObject);
+				simulatorOptions.RemoveAt(i);
+				i--;
+			}
+		}
+		if (simulator == null)
+		{
+			throw new System.NullReferenceException(string.Format(nullReference, simulatorMode, "Simulator"));
+		}
+
+		for (int i = 0; i < rendererOptions.Count; i++)
+		{
+			if (renderer == null && rendererOptions[i].mode == rendererMode)
+			{
+				renderer = rendererOptions[i].renderer;
+				renderer.gameObject.SetActive(true);
+			}
+			else
+			{
+				Destroy(rendererOptions[i].renderer.gameObject);
+				rendererOptions.RemoveAt(i);
+				i--;
+			}
+		}
+		if (renderer == null)
+		{
+			throw new System.NullReferenceException(string.Format(nullReference, rendererMode, "Renderer"));
 		}
 	}
 
@@ -46,7 +95,7 @@ public class FluidDispatcher : MonoBehaviour {
 	{
 		if (initializeOnStart)
 		{
-			simulator.Initialize(FamilyName);
+			simulator.Initialize(FamilyName, info, renderer);
 		}
 	}
 

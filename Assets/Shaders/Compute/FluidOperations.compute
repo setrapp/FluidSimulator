@@ -7,23 +7,20 @@
 #pragma kernel RemoveDivergence
 #pragma kernel EmptyBoundaries
 
-#define X_THREADS 2
+#define X_THREADS 2	// TODO try these at something like 8
 #define Y_THREADS 2
 #define Z_THREADS 1
 
-#define X_THREAD_STEP 1
-#define X_GROUP_STEP (X_THREAD_STEP * X_THREADS)
-#define Y_THREAD_STEP (X_GROUP_STEP * threadGroups.x)
-#define Y_GROUP_STEP (Y_THREAD_STEP * Y_THREADS)
-#define Z_THREAD_STEP (Y_GROUP_STEP * threadGroups.y)
+#define Z_THREAD_STEP 1
 #define Z_GROUP_STEP (Z_THREAD_STEP * Z_THREADS)
+#define Y_THREAD_STEP (Z_GROUP_STEP * threadGroups.z)
+#define Y_GROUP_STEP (Y_THREAD_STEP * Y_THREADS)
+#define X_THREAD_STEP (Y_GROUP_STEP * threadGroups.y)
+#define X_GROUP_STEP (X_THREAD_STEP * X_THREADS)
 
 #define GROUP_ID(id) int3(id.x / threadsPerGroup)
 #define THREAD_ID(id) int3(id - (GROUP_ID(id) * threadsPerGroup))
 #define NEIGHBOR_ID(id, delta) clamp((int3)id + delta, 0, (threadGroups * threadsPerGroup) - 1);
-
-#define IS_ON_BOUNDARY(id) min((id.x == 0) + (id.x == ((threadGroups.x * threadsPerGroup.x) - 1)) +\
-	(id.y == 0) + (id.y == ((threadGroups.y * threadsPerGroup.y) - 1)), 1)
 
 #define INDEX(threadId, groupId) ((groupId.x * X_GROUP_STEP) + (threadId.x * X_THREAD_STEP)) +\
 	((groupId.y * Y_GROUP_STEP) + (threadId.y * Y_THREAD_STEP)) + ((groupId.z * Z_GROUP_STEP) +\

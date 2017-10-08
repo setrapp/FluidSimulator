@@ -24,16 +24,18 @@ public class FluidSimulatorMouseInput : MonoBehaviour
 		oldMousePos = mousePosition;
 
 		SelectedFluid = null;
+		FluidCollider selectedCollider = null;
 
 		RaycastHit hit;
 		if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit))
 		{
-			FluidCellRenderer selected = hit.collider.GetComponent<FluidCellRenderer>();
-			if (selected != null)
+			selectedCollider = hit.collider.GetComponent<FluidCollider>();
+			if (selectedCollider != null)
 			{
-				SelectedFluid = selected.Simulator;
-				FluidCellIndex selectedIndex = new FluidCellIndex(selected.XIndex, selected.YIndex, 0);
-				SelectedFluid.SelectedCellIndex = selectedIndex;
+				SelectedFluid = selectedCollider.Simulator;
+				//FluidCellIndex selectedIndex = new FluidCellIndex(selected.XIndex, selected.YIndex, 0);
+				//SelectedFluid.SelectedCellIndex = selectedIndex;
+				selectedCollider.SelectCell(hit.point);
 			}
 		}
 
@@ -64,7 +66,8 @@ public class FluidSimulatorMouseInput : MonoBehaviour
 
 				if (densityChange != 0 || force.sqrMagnitude > 0)
 				{
-					SelectedFluid.AddExternal(SelectedFluid.SelectedCellIndex, densityChange, densityChangeRadius, force, forceRadius);
+					//SelectedFluid.AddExternal(SelectedFluid.SelectedCellIndex, densityChange, densityChangeRadius, force, forceRadius);
+					selectedCollider.AddExternal(hit.point, densityChange, densityChangeRadius, force, forceRadius);
 				}
 			}
 		}
