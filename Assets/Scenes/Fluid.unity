@@ -162,25 +162,6 @@ Prefab:
       propertyPath: m_Name
       value: Lonely Fluid Dispatcher
       objectReference: {fileID: 0}
-    - target: {fileID: 1313270380478682, guid: 528202cec4974904eb4df89408fa4cfa, type: 2}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114105785418012140, guid: 528202cec4974904eb4df89408fa4cfa,
-        type: 2}
-      propertyPath: info.fluidParameters.gridSize
-      value: 64
-      objectReference: {fileID: 0}
-    - target: {fileID: 114105785418012140, guid: 528202cec4974904eb4df89408fa4cfa,
-        type: 2}
-      propertyPath: info.fluidParameters.physicalSize
-      value: 32
-      objectReference: {fileID: 0}
-    - target: {fileID: 114105785418012140, guid: 528202cec4974904eb4df89408fa4cfa,
-        type: 2}
-      propertyPath: info.cellParameters.defaultCell.density
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 528202cec4974904eb4df89408fa4cfa, type: 2}
   m_IsPrefabParent: 0
