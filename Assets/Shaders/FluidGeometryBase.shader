@@ -47,8 +47,7 @@
 			{
 				float2 uv : TEXCOORD0;
 				float4 vertex : SV_POSITION;
-				float4 directionAndSpeed : COLOR;
-				float density : POINT; //TODO Should these structures be 16byte aligned.
+				float density : POINT; //TODO Should these structures be 16byte aligned?
 			};
 
 			float4 _GridSize;
@@ -64,21 +63,9 @@
 				o.uv = v.uv;
 
 				float2 cellIndex = float2(o.uv.x, o.uv.y) * _GridSize.xy;
-				float epsilon = 0.001;
 
 				FluidCell cell = _FluidCells[INDEX(float3(cellIndex, 0))];
 				o.density = cell.density / _MaxDensity;
-
-				// TODO Profile the sqrt cost
-				float speed = sqrt((cell.velocity.x * cell.velocity.x) + (cell.velocity.y * cell.velocity.y));
-				float normalizedSpeed = speed + epsilon;
-				float3 direction = cell.velocity / normalizedSpeed;
-				normalizedSpeed = min(normalizedSpeed / (_MaxSpeed), 1);
-
-				// Clip speed to zero when small enough.
-				normalizedSpeed = normalizedSpeed - (normalizedSpeed * (speed < epsilon));
-
-				o.directionAndSpeed = float4(direction, normalizedSpeed);
 
 				return o;
 			}
@@ -96,25 +83,21 @@
 				leftDown.vertex = center.vertex + float4(-offset, -offset, 0, 1);
 				leftDown.vertex = UnityObjectToClipPos(leftDown.vertex);
 				leftDown.uv = center.vertex;
-				leftDown.directionAndSpeed = center.directionAndSpeed;
 				leftDown.density = center.density;
 
 				leftUp.vertex = center.vertex + float4(-offset, offset, 0, 1);
 				leftUp.vertex = UnityObjectToClipPos(leftUp.vertex);
 				leftUp.uv = center.vertex;
-				leftUp.directionAndSpeed = center.directionAndSpeed;
 				leftUp.density = center.density;
 
 				rightDown.vertex = center.vertex + float4(offset, -offset, 0, 1);
 				rightDown.vertex = UnityObjectToClipPos(rightDown.vertex);
 				rightDown.uv = center.vertex;
-				rightDown.directionAndSpeed = center.directionAndSpeed;
 				rightDown.density = center.density;
 
 				rightUp.vertex = center.vertex + float4(offset, offset, 0, 1);
 				rightUp.vertex = UnityObjectToClipPos(rightUp.vertex);
 				rightUp.uv = center.vertex;
-				rightUp.directionAndSpeed = center.directionAndSpeed;
 				rightUp.density = center.density;
 
 				triStream.Append(leftDown);
@@ -125,14 +108,7 @@
 			
 			fixed4 frag (v2f i) : SV_Target
 			{
-				//float3 velocityColor = i.directionAndSpeed.rgb * i.directionAndSpeed.a;
 				float4 col = float4(1, 1, 1, i.density);
-				//float uvDotDirection = float((i.uv.x * i.directionAndSpeed.x) + (i.uv.y * i.directionAndSpeed.y));
-				//col.rbg = lerp(float3(0, 0, 0), float3(1, 1, 1), uvDotDirection);
-
-				// TODO Temporary render cell as white with black velocity line
-				//col = lerp(float4(1, 1, 1, 0), float4(0, 0, 0, 1), saturate(-i.density));
-
 				return col;
 			}
 			ENDCG

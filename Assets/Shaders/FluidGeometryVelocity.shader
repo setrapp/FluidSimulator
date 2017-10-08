@@ -47,8 +47,7 @@
 			{
 				float2 uv : TEXCOORD0;
 				float4 vertex : SV_POSITION;
-				float4 directionAndSpeed : COLOR;
-				float density : POINT; //TODO Should these structures be 16byte aligned.
+				float4 directionAndSpeed : COLOR; //TODO Should these structures be 16byte aligned?
 			};
 
 			float4 _GridSize;
@@ -67,7 +66,6 @@
 				float epsilon = 0.001;
 
 				FluidCell cell = _FluidCells[INDEX(float3(cellIndex, 0))];
-				o.density = cell.density / _MaxDensity;
 
 				// TODO Profile the sqrt cost
 				float speed = sqrt((cell.velocity.x * cell.velocity.x) + (cell.velocity.y * cell.velocity.y));
@@ -100,25 +98,21 @@
 				velStartDown.vertex = UnityObjectToClipPos(velStartDown.vertex);
 				velStartDown.uv = center.vertex;
 				velStartDown.directionAndSpeed = center.directionAndSpeed;
-				velStartDown.density = -1;
 
 				velStartUp.vertex = center.vertex + float4(width, 0);
 				velStartUp.vertex = UnityObjectToClipPos(velStartUp.vertex);
 				velStartUp.uv = center.vertex;
 				velStartUp.directionAndSpeed = center.directionAndSpeed;
-				velStartUp.density = -1;
 
 				velEndDown.vertex = center.vertex + float4(length * 2 - width, 0);
 				velEndDown.vertex = UnityObjectToClipPos(velEndDown.vertex);
 				velEndDown.uv = center.vertex;
 				velEndDown.directionAndSpeed = center.directionAndSpeed;
-				velEndDown.density = -1;
 
 				velEndUp.vertex = center.vertex + float4(length * 2 + width, 0);
 				velEndUp.vertex = UnityObjectToClipPos(velEndUp.vertex);
 				velEndUp.uv = center.vertex;
 				velEndUp.directionAndSpeed = center.directionAndSpeed;
-				velEndUp.density = -1;
 
 				triStream.Append(velStartDown);
 				triStream.Append(velStartUp);
@@ -128,15 +122,7 @@
 			
 			fixed4 frag (v2f i) : SV_Target
 			{
-				float3 velocityColor = i.directionAndSpeed.rgb * i.directionAndSpeed.a;
-				float4 col = float4(velocityColor, i.density);
-				float uvDotDirection = float((i.uv.x * i.directionAndSpeed.x) + (i.uv.y * i.directionAndSpeed.y));
-				col.rbg = lerp(float3(0, 0, 0), float3(1, 1, 1), uvDotDirection);
-
-				// TODO Temporary render cell as white with black velocity line
-				col = lerp(float4(1, 1, 1, 0), float4(0, 0, 0, 1), saturate(-i.density));
-
-				return col;
+				return float4(0, 0, 0, 1);
 			}
 			ENDCG
 		}
