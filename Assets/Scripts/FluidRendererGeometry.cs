@@ -5,14 +5,9 @@ using UnityEngine;
 public class FluidRendererGeometry : FluidRenderer, IRenderBuffer
 {
 	[SerializeField]
-	FluidMesh fluidBase;
+	FluidMesh FluidDensity;
 	[SerializeField]
 	FluidMesh fluidVelocity;
-
-	[SerializeField]
-	Material baseMaterial;
-	[SerializeField]
-	Material velocityMaterial;
 
 	protected override string generateCells()
 	{
@@ -24,8 +19,8 @@ public class FluidRendererGeometry : FluidRenderer, IRenderBuffer
 
 		if (string.IsNullOrEmpty(result))
 		{
-			fluidBase.InitializeMesh(gridSize, baseMaterial);
-			fluidVelocity.InitializeMesh(gridSize, velocityMaterial);
+			FluidDensity.InitializeMesh(gridSize);
+			fluidVelocity.InitializeMesh(gridSize);
 
 			transform.localScale = new Vector3(physicalSize, physicalSize, physicalSize);
 			GetComponent<FluidColliderBox>().Initialize(Simulator);
@@ -43,18 +38,18 @@ public class FluidRendererGeometry : FluidRenderer, IRenderBuffer
 			gridSize = fluidParameters.gridSize
 		};
 
-		if (fluidBase.gameObject.activeSelf != visualizationFlags.densityVisible)
+		if (FluidDensity.gameObject.activeSelf != visualizationFlags.densityVisible)
 		{
-			fluidBase.gameObject.SetActive(visualizationFlags.densityVisible);
+			FluidDensity.gameObject.SetActive(visualizationFlags.densityVisible);
 		}
 		if (fluidVelocity.gameObject.activeSelf != visualizationFlags.velocityVisible)
 		{
 			fluidVelocity.gameObject.SetActive(visualizationFlags.velocityVisible);
 		}
 
-		if (fluidBase.gameObject.activeSelf)
+		if (FluidDensity.gameObject.activeSelf)
 		{
-			fluidBase.PreRenderMesh(fluidCells, renderParameters);
+			FluidDensity.PreRenderMesh(fluidCells, renderParameters);
 		}
 		if (fluidVelocity.gameObject.activeSelf)
 		{

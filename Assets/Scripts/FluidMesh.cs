@@ -13,7 +13,7 @@ public class FluidMesh : MonoBehaviour
 {
 	MeshRenderer meshRenderer;
 
-	public void InitializeMesh(int gridSize, Material geometryMaterial)
+	public void InitializeMesh(int gridSize)
 	{
 		float cellSize = 1f / gridSize;
 		float center = (gridSize - 1) / 2f;
@@ -40,16 +40,23 @@ public class FluidMesh : MonoBehaviour
 		GetComponent<MeshFilter>().mesh = mesh;
 
 		meshRenderer = GetComponent<MeshRenderer>();
-		meshRenderer.material = geometryMaterial;
-		meshRenderer.material.SetVector("_GridSize", new Vector4(gridSize, gridSize, 1, 0));
-		meshRenderer.material.SetFloat("_CellSize", 0.5f / gridSize);
+		Material meshMaterial = meshRenderer.material;
+		meshMaterial.SetVector("_GridSize", new Vector4(gridSize, gridSize, 1, 0));
+		meshMaterial.SetFloat("_CellSize", 0.5f / gridSize);
 	}
 
 	public void PreRenderMesh(ComputeBuffer fluidCells, FluidMeshParameters parameters)
 	{
-		meshRenderer.material.SetBuffer("_FluidCells", fluidCells);
-		meshRenderer.material.SetFloat("_MaxDensity", parameters.cellMaxDensity);
-		meshRenderer.material.SetFloat("_MaxSpeed", parameters.cellMaxSpeed);
-		meshRenderer.material.SetFloat("_CellSize", 0.5f / parameters.gridSize);
+		Material meshMaterial = meshRenderer.material;
+		meshMaterial.SetBuffer("_FluidCells", fluidCells);
+		if (meshMaterial.HasProperty("_MaxDensity"))
+		{
+			meshRenderer.material.SetFloat("_MaxDensity", parameters.cellMaxDensity);
+		}
+		if (meshMaterial.HasProperty("_MaxSpeed"))
+		{
+			meshMaterial.SetFloat("_MaxSpeed", parameters.cellMaxSpeed);
+		}
+		meshMaterial.SetFloat("_CellSize", 0.5f / parameters.gridSize);
 	}
 }

@@ -113,7 +113,7 @@ GameObject:
   - component: {fileID: 23998009943571976}
   - component: {fileID: 114189803863023270}
   m_Layer: 0
-  m_Name: Fluid Base
+  m_Name: Fluid Density
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -339,7 +339,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 2100000, guid: cdb2aaa00fa8eee4593927c306901fea, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -371,7 +371,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 2100000, guid: 7f546c85aa1b5334abe2df84238f6cce, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -548,7 +548,7 @@ MonoBehaviour:
     fluidParameters:
       container: {fileID: 0}
       gridSize: 64
-      physicalSize: 16
+      physicalSize: 32
     cellParameters:
       defaultCell:
         density: 0
@@ -561,7 +561,7 @@ MonoBehaviour:
       cellSize: 1
     operationParameters:
       boundaryCondition: 0
-      diffusionRate: 0.005
+      diffusionRate: 0.001
       relaxationIterations: 20
     operationFlags:
       applyExternals: 1
@@ -702,10 +702,8 @@ MonoBehaviour:
     centerVisible: 0
     densityVisible: 1
     velocityVisible: 1
-  fluidBase: {fileID: 114189803863023270}
+  FluidDensity: {fileID: 114189803863023270}
   fluidVelocity: {fileID: 114434369421678318}
-  baseMaterial: {fileID: 2100000, guid: 7f546c85aa1b5334abe2df84238f6cce, type: 2}
-  velocityMaterial: {fileID: 2100000, guid: cdb2aaa00fa8eee4593927c306901fea, type: 2}
 --- !u!114 &114750093255040252
 MonoBehaviour:
   m_ObjectHideFlags: 1

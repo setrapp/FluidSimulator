@@ -1,11 +1,12 @@
-﻿Shader "Fluid/GeometryBase"
+﻿Shader "Fluid/GeometryDensity"
 {
 	Properties
 	{
+		_EmptyColor ("Empty Color", Color) = (0, 0, 0, 0)
+		_FullColor ("Full Color", Color) = (1, 1, 1, 1)
 		_GridSize ("Grid Size", Vector) = (0, 0, 0, 0)
 		_CellSize ("Cell Size", Float) = 1
-		_MaxDensity ("Max Density", Float) = 1
-		_MaxSpeed ("Max Speed", Float) = 10
+		_MaxDensity ("Max Density", Float) = 10
 	}
 	SubShader
 	{
@@ -50,11 +51,12 @@
 				float density : POINT; //TODO Should these structures be 16byte aligned?
 			};
 
+			float4 _EmptyColor;
+			float4 _FullColor;
 			float4 _GridSize;
 			float _CellSize;
 			StructuredBuffer<FluidCell> _FluidCells;
 			float _MaxDensity;
-			float _MaxSpeed;
 			
 			v2f vert (appdata v)
 			{
@@ -108,7 +110,7 @@
 			
 			fixed4 frag (v2f i) : SV_Target
 			{
-				float4 col = float4(1, 1, 1, i.density);
+				float4 col = lerp(_EmptyColor, _FullColor, i.density);
 				return col;
 			}
 			ENDCG

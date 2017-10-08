@@ -137,7 +137,7 @@
   <ItemGroup>
     <None Include="Assets\Shaders\Compute\FluidCompute.compute" />
     <None Include="Assets\Shaders\Compute\FluidOperations.compute" />
-    <None Include="Assets\Shaders\FluidGeometryBase.shader" />
+    <None Include="Assets\Shaders\FluidGeometryDensity.shader" />
     <None Include="Assets\Shaders\FluidGeometryVelocity.shader" />
     <None Include="Assets\Shaders\FluidTexture.shader" />
   </ItemGroup>

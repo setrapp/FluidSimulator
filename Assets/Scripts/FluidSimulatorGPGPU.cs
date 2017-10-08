@@ -73,7 +73,7 @@ public class FluidSimulatorGPGPU : FluidSimulator
 		{
 			for (int j = 0; j < fluidParameters.gridSize; j++)
 			{
-				initialCells[i, j] = new FluidCell();
+				initialCells[i, j] = cellParameters.defaultCell;
 				externalAdditions[i, j] = new FluidCell();
 				operationData[i, j] = new FluidCellOperationData();
 			}
