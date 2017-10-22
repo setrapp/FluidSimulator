@@ -17,6 +17,8 @@ public class FluidSimulatorMouseInput : MonoBehaviour
 	private Vector3 oldMousePos;
 	private Vector3 mouseMove;
 
+	public LayerMask fluidCollisionMask;
+
 	void Update()
 	{
 		Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition + new Vector3(0, 0, depthTarget.transform.position.z));
@@ -27,7 +29,7 @@ public class FluidSimulatorMouseInput : MonoBehaviour
 		FluidCollider selectedCollider = null;
 
 		RaycastHit hit;
-		if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit))
+		if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity, fluidCollisionMask))
 		{
 			selectedCollider = hit.collider.GetComponent<FluidCollider>();
 			if (selectedCollider != null)
@@ -70,7 +72,6 @@ public class FluidSimulatorMouseInput : MonoBehaviour
 					selectedCollider.AddExternal(hit.point, densityChange, densityChangeRadius, force, forceRadius);
 					// TODO Remove.
 					FluidCell test = FindObjectOfType<FluidSampler>().SamplePoint(hit.point);
-					Debug.Log("Cell Sampled " + test.density + " " + test.velocity);
 				}
 			}
 		}

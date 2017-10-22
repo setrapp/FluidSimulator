@@ -24,7 +24,7 @@ GameObject:
   - component: {fileID: 114119536707047830}
   - component: {fileID: 65386119863858292}
   - component: {fileID: 114750093255040252}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Fluid Renderer Pixels
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -40,7 +40,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4779417816499178}
   - component: {fileID: 114105785418012140}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Fluid Dispatcher
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -58,7 +58,7 @@ GameObject:
   - component: {fileID: 33920973880164662}
   - component: {fileID: 23920576559200574}
   - component: {fileID: 114434369421678318}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Fluid Velocity
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -78,7 +78,7 @@ GameObject:
   - component: {fileID: 114455997792969202}
   - component: {fileID: 65849802318905974}
   - component: {fileID: 114763311802827580}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Fluid Renderer Geometry
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -94,7 +94,8 @@ GameObject:
   m_Component:
   - component: {fileID: 4781075230651466}
   - component: {fileID: 114057362080539444}
-  m_Layer: 0
+  - component: {fileID: 114348122042929062}
+  m_Layer: 8
   m_Name: Fluid Simulator GPGPU
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -112,7 +113,7 @@ GameObject:
   - component: {fileID: 33196247535734286}
   - component: {fileID: 23998009943571976}
   - component: {fileID: 114189803863023270}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Fluid Density
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -128,7 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4965028169434170}
   - component: {fileID: 114072744174383932}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Fluid Renderer Objects
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -144,7 +145,8 @@ GameObject:
   m_Component:
   - component: {fileID: 4269010413360064}
   - component: {fileID: 114202064563080440}
-  m_Layer: 0
+  - component: {fileID: 114026501867730182}
+  m_Layer: 8
   m_Name: Fluid Simulator CPU
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -442,6 +444,17 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 6.1232336e-17}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &114026501867730182
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1764664264777904}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ca74149b7d331c46a0ebe7e41d4d464, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114057362080539444
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -482,6 +495,12 @@ MonoBehaviour:
     advect: 1
     handleDivergence: 1
     clampData: 1
+  sampler: {fileID: 114348122042929062}
+  fluidUpdated:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
   cellPrefab: {fileID: 114000014195457748, guid: e41896cc43767fe4da5ca5c132ca5260,
     type: 2}
   fluidComputer: {fileID: 7200000, guid: 2612196cd8877ab48930170b6ef5156f, type: 3}
@@ -658,8 +677,25 @@ MonoBehaviour:
     advect: 1
     handleDivergence: 1
     clampData: 1
+  sampler: {fileID: 114026501867730182}
+  fluidUpdated:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
   cellPrefab: {fileID: 114000014195457748, guid: e41896cc43767fe4da5ca5c132ca5260,
     type: 2}
+--- !u!114 &114348122042929062
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1591075508805772}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ca74149b7d331c46a0ebe7e41d4d464, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114434369421678318
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System;
 using UnityEngine.Profiling;
+using UnityEngine.Events;
 
 public abstract class FluidSimulator : MonoBehaviour
 {
@@ -41,9 +42,12 @@ public abstract class FluidSimulator : MonoBehaviour
 	public OperationParameters operationParameters;
 	public OperationFlags operationFlags;
 	new protected FluidRenderer renderer;
+	public FluidSampler sampler;
 	FluidOperationPass[] operations;
 	protected int operationPassNumber = 0;
 	delegate void FluidOperation();
+
+	public UnityEvent fluidUpdated;
 
 	public float GlobalDensity { get; protected set; }
 	private FluidCellIndex selectedCell = new FluidCellIndex();
@@ -85,6 +89,11 @@ public abstract class FluidSimulator : MonoBehaviour
 	protected abstract void pause();
 	protected abstract void step();
 
+	private void Start()
+	{
+		
+	}
+
 	public bool Initialize(string familyName, FluidInfo baseInfo, FluidRenderer renderer)
 	{
 		this.familyName = familyName;
@@ -123,6 +132,15 @@ public abstract class FluidSimulator : MonoBehaviour
 		{
 			EndSimulatorProfilerSample();
 			result = string.Format("Failed to initialize buffers: {0}", result);
+		}
+
+		if (sampler == null)
+		{
+			sampler = GetComponent<FluidSampler>();
+		}
+		if (sampler != null)
+		{
+			sampler.Initialize(this);
 		}
 
 		Profiler.EndSample();
@@ -178,6 +196,10 @@ public abstract class FluidSimulator : MonoBehaviour
 		PerformFluidOperations();
 		SendCellsToRenderer();
 		PrepareNextFrame();
+
+		Profiler.BeginSample("FluidUpdated.Invoke");
+		fluidUpdated.Invoke();
+		Profiler.EndSample();
 
 		EndSimulatorProfilerSample();
 	}

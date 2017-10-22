@@ -21,7 +21,7 @@ GameObject:
   - component: {fileID: 4000012038268946}
   - component: {fileID: 33000012723127670}
   - component: {fileID: 23000010127906934}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Solid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -38,7 +38,7 @@ GameObject:
   - component: {fileID: 4000010763573964}
   - component: {fileID: 33000012067903770}
   - component: {fileID: 23000013692046380}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Outline
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -56,7 +56,7 @@ GameObject:
   - component: {fileID: 65000013587796144}
   - component: {fileID: 114000014195457748}
   - component: {fileID: 114779446030939244}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Cell
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -73,7 +73,7 @@ GameObject:
   - component: {fileID: 4000011251649414}
   - component: {fileID: 33000012448469300}
   - component: {fileID: 23000014263852114}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Center
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -283,7 +283,7 @@ MonoBehaviour:
     velocity: {x: 0, y: 0, z: 0}
     rawDivergence: 0
     relaxedDivergence: 0
-  simulator: {fileID: 0}
+  fluidRenderer: {fileID: 0}
 --- !u!114 &114779446030939244
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -295,3 +295,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b602fde578f67b349a208af135b7e76e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  index:
+    x: -1
+    y: -1
+    z: -1
