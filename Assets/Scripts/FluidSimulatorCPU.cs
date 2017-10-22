@@ -60,11 +60,10 @@ public class FluidSimulatorCPU : FluidSimulator {
 
 		int densityCellRadius = (int)Mathf.Max(densityChangeRadius / cellParameters.cellSize, 0);
 		int forceCellRadius = (int)Mathf.Max(forceRadius / cellParameters.cellSize, 0);
-		int applyCellRadius = Mathf.Max(densityCellRadius, forceCellRadius);
+		int applyCellRadius = Mathf.Max(densityCellRadius, forceCellRadius, 1);
 
 		float densityFalloff = densityChange / (densityCellRadius + 1);
 		Vector3 forceFalloff = force / (forceCellRadius + 1);
-
 		for (int i = (int)Mathf.Max(index.x- applyCellRadius, 0); i < Mathf.Min(index.x + applyCellRadius, fluidParameters.gridSize - 1); i++)
 		{
 			for (int j = (int)Mathf.Max(index.y - applyCellRadius, 0); j < Mathf.Min(index.y + applyCellRadius, fluidParameters.gridSize - 1); j++)
@@ -93,10 +92,19 @@ public class FluidSimulatorCPU : FluidSimulator {
 		return externalAdditions[index.x, index.y];
 	}
 
-	protected override FluidCell getCell(FluidCellIndex index)
+	protected override void getCells(ref FluidCell[] cellsSerialOut)
 	{
-		return inCells[index.x, index.y];
+		int gridSize = fluidParameters.gridSize;
+		for (int i = 0; i < gridSize; i++)
+		{
+			int iIndex = i * gridSize;
+			for (int j = 0; j < gridSize; j++)
+			{
+				cellsSerialOut[iIndex + j] = inCells[i, j];
+			}
+		}
 	}
+
 
 	protected override FluidCellOperationData getCellOperationData(FluidCellIndex index)
 	{

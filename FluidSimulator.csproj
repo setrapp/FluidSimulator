@@ -13,11 +13,13 @@
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Unity Subset v3.5</TargetFrameworkProfile>
-    <CompilerResponseFile></CompilerResponseFile>
+    <CompilerResponseFile>
+    </CompilerResponseFile>
     <UnityProjectType>Game:1</UnityProjectType>
     <UnityBuildTarget>StandaloneWindows64:19</UnityBuildTarget>
     <UnityVersion>2017.1.0p4</UnityVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <LangVersion>4</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -92,6 +94,7 @@
     <Compile Include="Assets\Scripts\FluidRendererGeometry.cs" />
     <Compile Include="Assets\Scripts\FluidRendererObjects.cs" />
     <Compile Include="Assets\Scripts\FluidRendererPixels.cs" />
+    <Compile Include="Assets\Scripts\FluidSampler.cs" />
     <Compile Include="Assets\Scripts\FluidSimulator.cs" />
     <Compile Include="Assets\Scripts\FluidSimulatorCPU.cs" />
     <Compile Include="Assets\Scripts\FluidSimulatorGPGPU.cs" />

@@ -68,7 +68,7 @@ public abstract class FluidSimulator : MonoBehaviour
 	protected abstract void addExternal(FluidCellIndex index, float densityChange, float densityChangeRadius, Vector3 force, float forceRadius);
 	protected abstract void setExternal(FluidCellIndex index, FluidCell applyCell);
 	protected abstract FluidCell getExternal(FluidCellIndex index);
-	protected abstract FluidCell getCell(FluidCellIndex index);
+	protected abstract void getCells(ref FluidCell[] cellsSerialOut);
 	protected abstract FluidCellOperationData getCellOperationData(FluidCellIndex index);
 	protected abstract void applyExternalAdditions();
 	protected abstract void diffuse();
@@ -266,9 +266,13 @@ public abstract class FluidSimulator : MonoBehaviour
 		return getExternal(index);
 	}
 
-	public FluidCell GetCell(FluidCellIndex index)
+	public void GetCells(ref FluidCell[] cellsSerialOut)
 	{
-		return getCell(index);
+		if (cellsSerialOut == null || cellsSerialOut.Length != (fluidParameters.gridSize * fluidParameters.gridSize))
+		{
+			Debug.LogError("Invalid cell result array. Ensure an array of length (gridSize * gridSize) is passed.");
+		}
+		getCells(ref cellsSerialOut);
 	}
 
 	public FluidCellOperationData GetCellOperationData(FluidCellIndex index)

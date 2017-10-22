@@ -6,10 +6,6 @@ public class FluidSimulatorGPGPU : FluidSimulator
 	[Header("Cell Rendering")]
 	[SerializeField]
 	public FluidCellRenderer cellPrefab;
-	FluidCell[,] cellBuffer1;
-	FluidCell[,] cellBuffer2;
-	FluidCell[,] inCells;
-	FluidCell[,] outCells;
 	private FluidCell[,] externalAdditions;
 
 	int clampDataKernel;
@@ -157,9 +153,9 @@ public class FluidSimulatorGPGPU : FluidSimulator
 		return externalAdditions[index.x, index.y];
 	}
 
-	protected override FluidCell getCell(FluidCellIndex index)
+	protected override void getCells(ref FluidCell[] cellsSerialOut)
 	{
-		return inCells[index.x, index.y];
+		inFluidBuffer.GetData(cellsSerialOut);
 	}
 
 	protected override FluidCellOperationData getCellOperationData(FluidCellIndex index)

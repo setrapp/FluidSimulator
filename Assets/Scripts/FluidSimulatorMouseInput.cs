@@ -68,6 +68,9 @@ public class FluidSimulatorMouseInput : MonoBehaviour
 				{
 					//SelectedFluid.AddExternal(SelectedFluid.SelectedCellIndex, densityChange, densityChangeRadius, force, forceRadius);
 					selectedCollider.AddExternal(hit.point, densityChange, densityChangeRadius, force, forceRadius);
+					// TODO Remove.
+					FluidCell test = FindObjectOfType<FluidSampler>().SamplePoint(hit.point);
+					Debug.Log("Cell Sampled " + test.density + " " + test.velocity);
 				}
 			}
 		}
