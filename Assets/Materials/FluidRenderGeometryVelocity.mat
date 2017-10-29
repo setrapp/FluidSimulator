@@ -75,7 +75,7 @@ Material:
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _UVSec: 0
-    - _VelocityEndOffset: 2
+    - _VelocityEndOffset: 20
     - _VelocityStartOffset: 0
     - _VelocityWidth: 0.125
     - _ZWrite: 1
