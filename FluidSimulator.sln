@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2017
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluidSimulator", "FluidSimulator.csproj", "{254B5746-2CE2-F489-6C6C-7C30E0FD9E04}"
+# Visual Studio for Mac
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly-CSharp.csproj", "{8CCB41BB-DF4E-B321-4AC9-73FBDF3187C5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluidSimulator.Editor", "FluidSimulator.Editor.csproj", "{78FA1416-50A8-10BD-8B8F-9D94E6D182F6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp-Editor", "Assembly-CSharp-Editor.csproj", "{53F71E15-B34A-0710-D3DD-EED1873EA77C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,14 +11,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{254B5746-2CE2-F489-6C6C-7C30E0FD9E04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{254B5746-2CE2-F489-6C6C-7C30E0FD9E04}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{254B5746-2CE2-F489-6C6C-7C30E0FD9E04}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{254B5746-2CE2-F489-6C6C-7C30E0FD9E04}.Release|Any CPU.Build.0 = Release|Any CPU
-		{78FA1416-50A8-10BD-8B8F-9D94E6D182F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{78FA1416-50A8-10BD-8B8F-9D94E6D182F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{78FA1416-50A8-10BD-8B8F-9D94E6D182F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{78FA1416-50A8-10BD-8B8F-9D94E6D182F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8CCB41BB-DF4E-B321-4AC9-73FBDF3187C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8CCB41BB-DF4E-B321-4AC9-73FBDF3187C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8CCB41BB-DF4E-B321-4AC9-73FBDF3187C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8CCB41BB-DF4E-B321-4AC9-73FBDF3187C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53F71E15-B34A-0710-D3DD-EED1873EA77C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53F71E15-B34A-0710-D3DD-EED1873EA77C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53F71E15-B34A-0710-D3DD-EED1873EA77C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53F71E15-B34A-0710-D3DD-EED1873EA77C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

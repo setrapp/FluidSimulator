@@ -53,8 +53,9 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4000012345479980}
-  - component: {fileID: 114000014195457748}
   - component: {fileID: 65000013587796144}
+  - component: {fileID: 114000014195457748}
+  - component: {fileID: 114779446030939244}
   m_Layer: 0
   m_Name: Cell
   m_TagString: Untagged
@@ -140,7 +141,7 @@ MeshRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000010719400688}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 0
   m_MotionVectors: 0
@@ -283,3 +284,14 @@ MonoBehaviour:
     rawDivergence: 0
     relaxedDivergence: 0
   simulator: {fileID: 0}
+--- !u!114 &114779446030939244
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000012806265656}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b602fde578f67b349a208af135b7e76e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

@@ -7,7 +7,7 @@
 #pragma kernel RemoveDivergence
 #pragma kernel EmptyBoundaries
 
-#define X_THREADS 2
+#define X_THREADS 2    // TODO try these at something like 8
 #define Y_THREADS 2
 #define Z_THREADS 1
 
@@ -18,38 +18,35 @@
 #define Z_THREAD_STEP (Y_GROUP_STEP * threadGroups.y)
 #define Z_GROUP_STEP (Z_THREAD_STEP * Z_THREADS)
 
-#define GROUP_ID(id) int3(id.x / threadsPerGroup)
+#define GROUP_ID(id) int3(id / threadsPerGroup)
 #define THREAD_ID(id) int3(id - (GROUP_ID(id) * threadsPerGroup))
 #define NEIGHBOR_ID(id, delta) clamp((int3)id + delta, 0, (threadGroups * threadsPerGroup) - 1);
 
-#define IS_ON_BOUNDARY(id) min((id.x == 0) + (id.x == ((threadGroups.x * threadsPerGroup.x) - 1)) +\
-	(id.y == 0) + (id.y == ((threadGroups.y * threadsPerGroup.y) - 1)), 1)
-
 #define INDEX(threadId, groupId) ((groupId.x * X_GROUP_STEP) + (threadId.x * X_THREAD_STEP)) +\
-	((groupId.y * Y_GROUP_STEP) + (threadId.y * Y_THREAD_STEP)) + ((groupId.z * Z_GROUP_STEP) +\
-	(threadId.z * Z_THREAD_STEP))
+    ((groupId.y * Y_GROUP_STEP) + (threadId.y * Y_THREAD_STEP)) +\
+    ((groupId.z * Z_GROUP_STEP) + (threadId.z * Z_THREAD_STEP))
 
 // IMPORTANT: All StructuredBuffer structs should be 16 byte (float4) aligned, add padding if necessary.
 struct FluidCell
 {
-	float density;
-	float3 velocity;
-	float rawDivergence;
-	float relaxedDivergence;
-	float2 padding;
+    float density;
+    float3 velocity;
+    float rawDivergence;
+    float relaxedDivergence;
+    float2 padding;
 };
 
 struct FluidCellOperationData
 {
-	int3 leftId;
-	int3 rightId;
-	int3 downId;
-	int3 upId;
-	int3 backId;
-	int3 forwardId;
-	float3 advectIdVelocity;
-	int3 advectPastId;
-	float3 advectSamplePercentages;
+    int3 leftId;
+    int3 rightId;
+    int3 downId;
+    int3 upId;
+    int3 backId;
+    int3 forwardId;
+    float3 advectIdVelocity;
+    int3 advectPastId;
+    float3 advectSamplePercentages;
 };
 
 float4 clearColor;
@@ -70,209 +67,207 @@ float diffusionRate;
 float cellSize;
 float cellsPerSide; // TODO this may be redundant if we know (cellsPerSide == threadGroups * threadPerGroups)
 
+//TODO What is the difference between this and FluidCompute?????
+
 [numthreads (X_THREADS, Y_THREADS, Z_THREADS)]
 void ClampData (uint3 id : SV_DispatchThreadId, uint3 groupId : SV_GroupId, uint3 threadId : SV_GroupThreadId)
 {
-	int index = INDEX (threadId, groupId);
-	float epsilon = 0.001;
+    int index = INDEX (threadId, groupId);
+    float epsilon = 0.001;
 
-	float3 velocity = inBuffer[index].velocity;
-	float speed = sqrt ((velocity.x * velocity.x) + (velocity.y * velocity.y) + (velocity.z * velocity.z));
+    float3 velocity = inBuffer[index].velocity;
+    float speed = sqrt ((velocity.x * velocity.x) + (velocity.y * velocity.y) + (velocity.z * velocity.z));
 
-	// Normalize and clamp to max speed, but avoid dividing by zero.
-	speed += epsilon * (speed <= 0);
-	velocity = (velocity / speed) * min (speed, maxSpeed);
+    // Normalize and clamp to max speed, but avoid dividing by zero.
+    speed += epsilon * (speed <= 0);
+    velocity = (velocity / speed) * min (speed, maxSpeed);
 
-	// Clip to no velocity if speed is low enough.
-	velocity -= velocity * (speed < epsilon);
+    // Clip to no velocity if speed is low enough.
+    velocity -= velocity * (speed < epsilon);
 
-	outBuffer[index].velocity = velocity;
-	outBuffer[index].density = clamp (inBuffer[index].density, 0, maxDensity);
+    outBuffer[index].velocity = velocity;
+    outBuffer[index].density = clamp (inBuffer[index].density, 0, maxDensity);
 }
 
 [numthreads (X_THREADS, Y_THREADS, Z_THREADS)]
 void ApplyExternals (uint3 id : SV_DispatchThreadId, uint3 groupId : SV_GroupId, uint3 threadId : SV_GroupThreadId)
 {
-	int index = INDEX (threadId, groupId);
-	uint3 groupIds = THREAD_ID (id);
-	outBuffer[index].velocity = inBuffer[index].velocity + (externalsBuffer[index].velocity * deltaTime);
-	outBuffer[index].density = inBuffer[index].density + (externalsBuffer[index].density * deltaTime);
+    int index = INDEX (threadId, groupId);
+    uint3 groupIds = THREAD_ID (id);
+    outBuffer[index].velocity = inBuffer[index].velocity + (externalsBuffer[index].velocity * deltaTime);
+    outBuffer[index].density = inBuffer[index].density + (externalsBuffer[index].density * deltaTime);
 }
 
 [numthreads (X_THREADS, Y_THREADS, Z_THREADS)]
 void Diffuse (uint3 id : SV_DispatchThreadId, uint3 groupId : SV_GroupId, uint3 threadId : SV_GroupThreadId)
 {
-	int index = INDEX (threadId, groupId);
+    int index = INDEX (threadId, groupId);
 
-	uint3 previousNeighborIds = NEIGHBOR_ID (id, -1);
-	uint3 nextNeighborIds = NEIGHBOR_ID (id, 1);
+    uint3 previousNeighborIds = NEIGHBOR_ID (id, -1);
+    uint3 nextNeighborIds = NEIGHBOR_ID (id, 1);
 
-	uint3 leftId = uint3(previousNeighborIds.x, id.y, id.z);
-	uint3 rightId = uint3(nextNeighborIds.x, id.y, id.z);
-	uint3 downId = uint3(id.x, previousNeighborIds.y, id.z);
-	uint3 upId = uint3(id.x, nextNeighborIds.y, id.z);
+    uint3 leftId = uint3(previousNeighborIds.x, id.y, id.z);
+    uint3 rightId = uint3(nextNeighborIds.x, id.y, id.z);
+    uint3 downId = uint3(id.x, previousNeighborIds.y, id.z);
+    uint3 upId = uint3(id.x, nextNeighborIds.y, id.z);
 
-	FluidCell leftCell = inBuffer[INDEX (THREAD_ID (leftId), GROUP_ID (leftId))];
-	FluidCell rightCell = inBuffer[INDEX (THREAD_ID (rightId), GROUP_ID (rightId))];
-	FluidCell downCell = inBuffer[INDEX (THREAD_ID (downId), GROUP_ID (downId))];
-	FluidCell upCell = inBuffer[INDEX (THREAD_ID (upId), GROUP_ID (upId))];
+    FluidCell leftCell = inBuffer[INDEX (THREAD_ID (leftId), GROUP_ID (leftId))];
+    FluidCell rightCell = inBuffer[INDEX (THREAD_ID (rightId), GROUP_ID (rightId))];
+    FluidCell downCell = inBuffer[INDEX (THREAD_ID (downId), GROUP_ID (downId))];
+    FluidCell upCell = inBuffer[INDEX (THREAD_ID (upId), GROUP_ID (upId))];
 
-	outBuffer[index].velocity = (inBuffer[index].velocity +
-		diffusionRate * (leftCell.velocity + rightCell.velocity + downCell.velocity + upCell.velocity)) / (1 + (4 * diffusionRate));
-	outBuffer[index].density =  (inBuffer[index].density +
-		diffusionRate * (leftCell.density + rightCell.density + downCell.density + upCell.density)) / (1 + (4 * diffusionRate));
+    outBuffer[index].velocity = (inBuffer[index].velocity +
+        diffusionRate * (leftCell.velocity + rightCell.velocity + downCell.velocity + upCell.velocity)) / (1 + (4 * diffusionRate));
+    outBuffer[index].density =  (inBuffer[index].density +
+        diffusionRate * (leftCell.density + rightCell.density + downCell.density + upCell.density)) / (1 + (4 * diffusionRate));
 
-	operationDataBuffer[index].leftId = leftId;
-	operationDataBuffer[index].rightId = rightId;
-	operationDataBuffer[index].downId = downId;
-	operationDataBuffer[index].upId = upId;
+    operationDataBuffer[index].leftId = leftId;
+    operationDataBuffer[index].rightId = rightId;
+    operationDataBuffer[index].downId = downId;
+    operationDataBuffer[index].upId = upId;
 }
 
 [numthreads (X_THREADS, Y_THREADS, Z_THREADS)]
 void Advect (uint3 id : SV_DispatchThreadId, uint3 groupId : SV_GroupId, uint3 threadId : SV_GroupThreadId)
 {
-	int index = INDEX (threadId, groupId);
+    int index = INDEX (threadId, groupId);
 
-	// TODO Should we be clamping pastId to 0.5 of the boundary cells (like we do on CPU)?
+    // TODO Should we be clamping pastId to 0.5 of the boundary cells (like we do on CPU)?
 
-	float3 idVelocity = inBuffer[index].velocity / cellSize;
-	float3 pastId = float3(id) - idVelocity;
-	pastId.x = clamp (pastId.x, 1.5, threadGroups.x * threadsPerGroup.x - 1.5);
-	pastId.y = clamp (pastId.y, 1.5, threadGroups.y * threadsPerGroup.y - 1.5);
-	pastId.z = clamp (pastId.z, 1.5, threadGroups.z * threadsPerGroup.z - 1.5);
+    float3 idVelocity = inBuffer[index].velocity / cellSize;
+    float3 pastId = float3(id) - idVelocity;
+    pastId.x = clamp (pastId.x, 1.5, threadGroups.x * threadsPerGroup.x - 1.5);
+    pastId.y = clamp (pastId.y, 1.5, threadGroups.y * threadsPerGroup.y - 1.5);
+    pastId.z = clamp (pastId.z, 1.5, threadGroups.z * threadsPerGroup.z - 1.5);
 
-	int leftId = pastId.x;
-	int rightId = leftId + 1;
-	int downId = pastId.y;
-	int upId = downId + 1;
+    int leftId = pastId.x;
+    int rightId = leftId + 1;
+    int downId = pastId.y;
+    int upId = downId + 1;
 
-	float rightPortion =  pastId.x - leftId;
-	float leftPortion = 1 - rightPortion;
-	float upPortion = pastId.y - downId;
-	float downPortion = 1 - upPortion;
+    float rightPortion =  pastId.x - leftId;
+    float leftPortion = 1 - rightPortion;
+    float upPortion = pastId.y - downId;
+    float downPortion = 1 - upPortion;
 
-	int3 ldId = int3(leftId, downId, pastId.z);
-	int3 luId = int3(leftId, upId, pastId.z);
-	int3 rdId = int3(rightId, downId, pastId.z);
-	int3 ruId = int3(rightId, upId, pastId.z);
+    int3 ldId = int3(leftId, downId, pastId.z);
+    int3 luId = int3(leftId, upId, pastId.z);
+    int3 rdId = int3(rightId, downId, pastId.z);
+    int3 ruId = int3(rightId, upId, pastId.z);
 
-	outBuffer[index].velocity =
-	leftPortion * ((downPortion * inBuffer[INDEX (THREAD_ID (ldId), GROUP_ID (ldId))].velocity) + (upPortion * inBuffer[INDEX (THREAD_ID (luId), GROUP_ID (luId))].velocity)) +
-	rightPortion * ((downPortion * inBuffer[INDEX (THREAD_ID (rdId), GROUP_ID (rdId))].velocity) + (upPortion * inBuffer[INDEX (THREAD_ID (ruId), GROUP_ID (ruId))].velocity));
+    outBuffer[index].velocity =
+    leftPortion * ((downPortion * inBuffer[INDEX (THREAD_ID (ldId), GROUP_ID (ldId))].velocity) + (upPortion * inBuffer[INDEX (THREAD_ID (luId), GROUP_ID (luId))].velocity)) +
+    rightPortion * ((downPortion * inBuffer[INDEX (THREAD_ID (rdId), GROUP_ID (rdId))].velocity) + (upPortion * inBuffer[INDEX (THREAD_ID (ruId), GROUP_ID (ruId))].velocity));
 
-	outBuffer[index].density =
-		leftPortion * ((downPortion * inBuffer[INDEX (THREAD_ID (ldId), GROUP_ID (ldId))].density) + (upPortion * inBuffer[INDEX (THREAD_ID (luId), GROUP_ID (luId))].density)) +
-		rightPortion * ((downPortion * inBuffer[INDEX (THREAD_ID (rdId), GROUP_ID (rdId))].density) + (upPortion * inBuffer[INDEX (THREAD_ID (ruId), GROUP_ID (ruId))].density));
+    outBuffer[index].density =
+        leftPortion * ((downPortion * inBuffer[INDEX (THREAD_ID (ldId), GROUP_ID (ldId))].density) + (upPortion * inBuffer[INDEX (THREAD_ID (luId), GROUP_ID (luId))].density)) +
+        rightPortion * ((downPortion * inBuffer[INDEX (THREAD_ID (rdId), GROUP_ID (rdId))].density) + (upPortion * inBuffer[INDEX (THREAD_ID (ruId), GROUP_ID (ruId))].density));
 
-	operationDataBuffer[index].advectIdVelocity = idVelocity;
-	operationDataBuffer[index].advectPastId = int3(pastId);
-	operationDataBuffer[index].advectSamplePercentages = float3(rightPortion, upPortion, 0);
+    operationDataBuffer[index].advectIdVelocity = idVelocity;
+    operationDataBuffer[index].advectPastId = int3(pastId);
+    operationDataBuffer[index].advectSamplePercentages = float3(rightPortion, upPortion, 0);
 }
 
 [numthreads (X_THREADS, Y_THREADS, Z_THREADS)]
 void ComputeDivergence (uint3 id : SV_DispatchThreadId, uint3 groupId : SV_GroupId, uint3 threadId : SV_GroupThreadId)
 {
-	int index = INDEX (threadId, groupId);
+    int index = INDEX (threadId, groupId);
 
-	uint3 previousNeighborIds = NEIGHBOR_ID (id, -1);
-	uint3 nextNeighborIds = NEIGHBOR_ID (id, 1);
+    uint3 previousNeighborIds = NEIGHBOR_ID (id, -1);
+    uint3 nextNeighborIds = NEIGHBOR_ID (id, 1);
 
-	uint3 leftId = uint3(previousNeighborIds.x, id.y, id.z);
-	uint3 rightId = uint3(nextNeighborIds.x, id.y, id.z);
-	uint3 downId = uint3(id.x, previousNeighborIds.y, id.z);
-	uint3 upId = uint3(id.x, nextNeighborIds.y, id.z);
+    uint3 leftId = uint3(previousNeighborIds.x, id.y, id.z);
+    uint3 rightId = uint3(nextNeighborIds.x, id.y, id.z);
+    uint3 downId = uint3(id.x, previousNeighborIds.y, id.z);
+    uint3 upId = uint3(id.x, nextNeighborIds.y, id.z);
 
-	FluidCell leftCell = inBuffer[INDEX (THREAD_ID (leftId), GROUP_ID (leftId))];
-	FluidCell rightCell = inBuffer[INDEX (THREAD_ID (rightId), GROUP_ID (rightId))];
-	FluidCell downCell = inBuffer[INDEX (THREAD_ID (downId), GROUP_ID (downId))];
-	FluidCell upCell = inBuffer[INDEX (THREAD_ID (upId), GROUP_ID (upId))];
+    FluidCell leftCell = inBuffer[INDEX (THREAD_ID (leftId), GROUP_ID (leftId))];
+    FluidCell rightCell = inBuffer[INDEX (THREAD_ID (rightId), GROUP_ID (rightId))];
+    FluidCell downCell = inBuffer[INDEX (THREAD_ID (downId), GROUP_ID (downId))];
+    FluidCell upCell = inBuffer[INDEX (THREAD_ID (upId), GROUP_ID (upId))];
 
-	outBuffer[index].rawDivergence = -0.5f / cellsPerSide *
-		((rightCell.velocity.x - leftCell.velocity.x) +
-		(upCell.velocity.y - downCell.velocity.y));
-	outBuffer[index].relaxedDivergence = 0;
+    outBuffer[index].rawDivergence = -0.5f / cellsPerSide *
+        ((rightCell.velocity.x - leftCell.velocity.x) +
+        (upCell.velocity.y - downCell.velocity.y));
+    outBuffer[index].relaxedDivergence = 0;
 
-	outBuffer[index].velocity = inBuffer[index].velocity;
-	outBuffer[index].density = inBuffer[index].density;
+    outBuffer[index].velocity = inBuffer[index].velocity;
+    outBuffer[index].density = inBuffer[index].density;
 }
 
 [numthreads (X_THREADS, Y_THREADS, Z_THREADS)]
 void RelaxDivergence (uint3 id : SV_DispatchThreadId, uint3 groupId : SV_GroupId, uint3 threadId : SV_GroupThreadId)
 {
-	int index = INDEX (threadId, groupId);
+    int index = INDEX (threadId, groupId);
 
-	uint3 previousNeighborIds = NEIGHBOR_ID (id, -1);
-	uint3 nextNeighborIds = NEIGHBOR_ID (id, 1);
+    uint3 previousNeighborIds = NEIGHBOR_ID (id, -1);
+    uint3 nextNeighborIds = NEIGHBOR_ID (id, 1);
 
-	uint3 leftId = uint3(previousNeighborIds.x, id.y, id.z);
-	uint3 rightId = uint3(nextNeighborIds.x, id.y, id.z);
-	uint3 downId = uint3(id.x, previousNeighborIds.y, id.z);
-	uint3 upId = uint3(id.x, nextNeighborIds.y, id.z);
+    uint3 leftId = uint3(previousNeighborIds.x, id.y, id.z);
+    uint3 rightId = uint3(nextNeighborIds.x, id.y, id.z);
+    uint3 downId = uint3(id.x, previousNeighborIds.y, id.z);
+    uint3 upId = uint3(id.x, nextNeighborIds.y, id.z);
 
-	FluidCell leftCell = inBuffer[INDEX (THREAD_ID (leftId), GROUP_ID (leftId))];
-	FluidCell rightCell = inBuffer[INDEX (THREAD_ID (rightId), GROUP_ID (rightId))];
-	FluidCell downCell = inBuffer[INDEX (THREAD_ID (downId), GROUP_ID (downId))];
-	FluidCell upCell = inBuffer[INDEX (THREAD_ID (upId), GROUP_ID (upId))];
+    FluidCell leftCell = inBuffer[INDEX (THREAD_ID (leftId), GROUP_ID (leftId))];
+    FluidCell rightCell = inBuffer[INDEX (THREAD_ID (rightId), GROUP_ID (rightId))];
+    FluidCell downCell = inBuffer[INDEX (THREAD_ID (downId), GROUP_ID (downId))];
+    FluidCell upCell = inBuffer[INDEX (THREAD_ID (upId), GROUP_ID (upId))];
 
-	outBuffer[index].relaxedDivergence = (inBuffer[index].rawDivergence +
-		leftCell.relaxedDivergence + rightCell.relaxedDivergence + downCell.relaxedDivergence + upCell.relaxedDivergence) * 0.25;
+    outBuffer[index].relaxedDivergence = (inBuffer[index].rawDivergence +
+        leftCell.relaxedDivergence + rightCell.relaxedDivergence + downCell.relaxedDivergence + upCell.relaxedDivergence) * 0.25;
 
-	outBuffer[index].velocity = inBuffer[index].velocity;
-	outBuffer[index].density = inBuffer[index].density;
+    outBuffer[index].velocity = inBuffer[index].velocity;
+    outBuffer[index].density = inBuffer[index].density;
 }
 
 [numthreads (X_THREADS, Y_THREADS, Z_THREADS)]
 void RemoveDivergence (uint3 id : SV_DispatchThreadId, uint3 groupId : SV_GroupId, uint3 threadId : SV_GroupThreadId)
 {
-	int index = INDEX (threadId, groupId);
+    int index = INDEX (threadId, groupId);
 
-	uint3 previousNeighborIds = NEIGHBOR_ID (id, -1);
-	uint3 nextNeighborIds = NEIGHBOR_ID (id, 1);
+    uint3 previousNeighborIds = NEIGHBOR_ID (id, -1);
+    uint3 nextNeighborIds = NEIGHBOR_ID (id, 1);
 
-	uint3 leftId = uint3(previousNeighborIds.x, id.y, id.z);
-	uint3 rightId = uint3(nextNeighborIds.x, id.y, id.z);
-	uint3 downId = uint3(id.x, previousNeighborIds.y, id.z);
-	uint3 upId = uint3(id.x, nextNeighborIds.y, id.z);
+    uint3 leftId = uint3(previousNeighborIds.x, id.y, id.z);
+    uint3 rightId = uint3(nextNeighborIds.x, id.y, id.z);
+    uint3 downId = uint3(id.x, previousNeighborIds.y, id.z);
+    uint3 upId = uint3(id.x, nextNeighborIds.y, id.z);
 
-	FluidCell leftCell = inBuffer[INDEX (THREAD_ID (leftId), GROUP_ID (leftId))];
-	FluidCell rightCell = inBuffer[INDEX (THREAD_ID (rightId), GROUP_ID (rightId))];
-	FluidCell downCell = inBuffer[INDEX (THREAD_ID (downId), GROUP_ID (downId))];
-	FluidCell upCell = inBuffer[INDEX (THREAD_ID (upId), GROUP_ID (upId))];
+    FluidCell leftCell = inBuffer[INDEX (THREAD_ID (leftId), GROUP_ID (leftId))];
+    FluidCell rightCell = inBuffer[INDEX (THREAD_ID (rightId), GROUP_ID (rightId))];
+    FluidCell downCell = inBuffer[INDEX (THREAD_ID (downId), GROUP_ID (downId))];
+    FluidCell upCell = inBuffer[INDEX (THREAD_ID (upId), GROUP_ID (upId))];
 
-	outBuffer[index].velocity.x = inBuffer[index].velocity.x - (0.5 * (rightCell.relaxedDivergence - leftCell.relaxedDivergence) * cellsPerSide);
-	outBuffer[index].velocity.y = inBuffer[index].velocity.y - (0.5 * (upCell.relaxedDivergence - downCell.relaxedDivergence) * cellsPerSide);
-	outBuffer[index].velocity = outBuffer[index].velocity;
+    outBuffer[index].velocity.x = inBuffer[index].velocity.x - (0.5 * (rightCell.relaxedDivergence - leftCell.relaxedDivergence) * cellsPerSide);
+    outBuffer[index].velocity.y = inBuffer[index].velocity.y - (0.5 * (upCell.relaxedDivergence - downCell.relaxedDivergence) * cellsPerSide);
+    outBuffer[index].velocity = outBuffer[index].velocity;
 
-	outBuffer[index].density = inBuffer[index].density;
+    outBuffer[index].density = inBuffer[index].density;
 }
 
 [numthreads (X_THREADS, 1, 1)]
 void EmptyBoundaries (uint3 id : SV_DispatchThreadId, uint3 groupId : SV_GroupId, uint3 threadId : SV_GroupThreadId)
 {
-	int maxIndex = (threadGroups * threadsPerGroup) - 1;
-	int sampleCorner = ((threadId.x == 0) && (groupId.x == 0)) -
-		((threadId.x == threadsPerGroup.x - 1) && (groupId.x == threadGroups.x - 1));
-	int index;
+    int maxIndex = (threadGroups * threadsPerGroup) - 1;
+    int index;
 
-	// Bottom
-	index = INDEX (int3(threadId.x, 0, 0), int3(groupId.x, 0, 0));
-	outBuffer[index].velocity = 0;
-	outBuffer[index].density = 0;
+    // Bottom
+    index = INDEX (int3(threadId.x, 0, 0), int3(groupId.x, 0, 0));
+    outBuffer[index].velocity = 0;
+    outBuffer[index].density = 0;
 
-	// Top
-	index = INDEX (int3(threadId.x, threadsPerGroup.x - 1, 0), int3(groupId.x, threadGroups.x - 1, 0));
-	outBuffer[index].velocity = 0;
-	outBuffer[index].density = 0;
+    // Top
+    index = INDEX (int3(threadId.x, threadsPerGroup.x - 1, 0), int3(groupId.x, threadGroups.x - 1, 0));
+    outBuffer[index].velocity = 0;
+    outBuffer[index].density = 0;
 
+    // Left
+    index = INDEX (int3(0, threadId.x, 0), int3(0, groupId.x, 0));
+    outBuffer[index].velocity = 0;
+    outBuffer[index].density = 0;
 
-	// Left
-	index = INDEX (int3(0, threadId.x, 0), int3(0, groupId.x, 0));
-	outBuffer[index].velocity = 0;
-	outBuffer[index].density = 0;
-
-
-	// Right
-	index = INDEX (int3(threadsPerGroup.x - 1, threadId.x, 0), int3(threadGroups.x - 1, groupId.x, 0));
-	outBuffer[index].velocity = 0;
-	outBuffer[index].density = 0;
+    // Right
+    index = INDEX (int3(threadsPerGroup.x - 1, threadId.x, 0), int3(threadGroups.x - 1, groupId.x, 0));
+    outBuffer[index].velocity = 0;
+    outBuffer[index].density = 0;
 }
